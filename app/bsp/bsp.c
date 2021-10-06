@@ -16,10 +16,6 @@
 /* Private defines ---------------------------------------------------------- */
 static const char *TAG = "BSP";
 
-#define TXD_PIN         (GPIO_NUM_17)
-#define RXD_PIN         (GPIO_NUM_16)
-#define RX_BUF_SIZE     (2000)
-
 /* Public variables --------------------------------------------------------- */
 /* Private variables -------------------------------------------------------- */
 /* Private function prototypes ---------------------------------------------- */
