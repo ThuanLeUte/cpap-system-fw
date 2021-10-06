@@ -25,12 +25,24 @@ static inline void m_bsp_spiffs_init(void);
 /* Function definitions ----------------------------------------------------- */
 void bsp_init(void)
 {
+  m_bsp_nvs_init();
+  m_bsp_spiffs_init();
 }
 
+
 /* Private function --------------------------------------------------------- */
+
+
 static inline void m_bsp_nvs_init(void)
 {
   esp_err_t ret = ESP_OK;
+
+  ret = nvs_flash_init();
+  if ((ESP_ERR_NVS_NO_FREE_PAGES == ret) || (ESP_ERR_NVS_NEW_VERSION_FOUND == ret))
+  {
+    ESP_ERROR_CHECK(nvs_flash_erase());
+    ESP_ERROR_CHECK(nvs_flash_init());
+  }
 }
 
 static inline void m_bsp_spiffs_init(void)
