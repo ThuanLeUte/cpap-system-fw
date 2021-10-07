@@ -1,101 +1,120 @@
 /**
- * @file       bsp.h
+ * @file       pac1934.h
  * @copyright  Copyright (C) 2020 Hydratech. All rights reserved.
  * @license    This project is released under the Hydratech License.
  * @version    1.0.0
- * @date       2021-01-23
- * @author     Thuan Le
- * @brief      Board Support Package (BSP)
+ * @date       2021-10-07
+ * @author     Hiep Le
+ * @brief      Driver support PAC1934 (Multi Channel Power Monitor)
  * @note       None
  * @example    None
  */
 
 /* Define to prevent recursive inclusion ------------------------------ */
-#ifndef __BSP_H
-#define __BSP_H
+#ifndef __PAC1934_H
+#define __PAC1934_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ----------------------------------------------------------- */
-#include "platform_common.h"
-#include "bsp_io_10.h"
+#include "bsp.h"
 
 /* Public defines ----------------------------------------------------- */
+#define PAC1934_I2C_ADDR                       (0x11) // 7 Bits
+
 /* Public enumerate/structure ----------------------------------------- */
 /**
- * @brief Base status structure
+ * @brief PAC1934 data
  */
-typedef enum
+typedef struct
 {
-  BS_OK = 0x00,
-  BS_ERROR_PARAMS,
-  BS_ERROR
+  double	volt;            //Temporary variable used for voltage calculation
+  double 	current;         //Temporary variable used for current calculation
+  double 	power;           //Temporary variable used for power calculation
+  double 	energy;          //Temporary variable used for energy calculation
 }
-base_status_t;
+pac1934_data_t;
 
 /**
- * @brief Bool structure
+ * @brief PAC1934 sensor struct
  */
-typedef enum
+typedef struct 
 {
-  BS_FALSE = 0x00,
-  BS_TRUE  = 0x01
+  uint8_t  device_address;  // I2C device address
+
+  // Read n-bytes from device's internal address <reg_addr> via I2C bus
+  int (*i2c_read) (uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len);
+
+  // Write n-bytes from device's internal address <reg_addr> via I2C bus
+  int (*i2c_write) (uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len);
+
+  // delay a time period in milisecond 
+  int (*delay_ms) (uint32_t ms);
 }
-bool_t;
+pac1934_t;
 
-/* Public macros ------------------------------------------------------ */
-#define CHECK(expr, ret)            \
-  do {                              \
-    if (!(expr)) {                  \
-      ESP_LOGE(TAG, "%s", #expr);   \
-      return (ret);                 \
-    }                               \
-  } while (0)
-
-#define CHECK_STATUS(expr)          \
-  do {                              \
-    base_status_t ret = (expr);     \
-    if (BS_OK != ret) {             \
-      ESP_LOGE(TAG, "%s", #expr);   \
-      return (ret);                 \
-    }                               \
-  } while (0)
-
-/* Public variables --------------------------------------------------- */
 /* Public function prototypes ----------------------------------------- */
 /**
- * @brief         Board support package init
+ * @brief         PAC1934 init
  *
- * @param[in]     None
- *
- * @attention     None
- *
- * @return        None
- */
-void bsp_hw_init(void);
-
-/**
- * @brief         I2C read
- *
- * @param[in]     slave_addr    Slave address
- * @param[in]     reg_addr      Register address
- * @param[in]     p_data        Pointer to handle of data
- * @param[in]     len           Data length
+ * @param[in]     me      Pointer to handle of PAC1934 module.
  *
  * @attention     None
  *
  * @return
- * - 0      Succes
- * - 1      Error
+ * - BS_OK
+ * - BS_ERROR
  */
-int bsp_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint8_t *p_data, uint32_t len);
+base_status_t pac1934_init(pac1934_t *me);
+
+/**
+ * @brief         PAC1934 init
+ *
+ * @param[in]     me            Pointer to handle of PAC1934 module.
+ * @param[in]     channel       Channel number of PAC1934 module.
+ * @param[in]     data          Voltage value of PAC1934 module..
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t pac1934_voltage_measurement(pac1934_t *me, pac1934_data_t *data, uint8_t channel)
+
+/**
+ * @brief         PAC1934 init
+ *
+ * @param[in]     me            Pointer to handle of PAC1934 module.
+ * @param[in]     channel       Channel number of PAC1934 module.
+ * @param[in]     data          Current value of PAC1934 module..
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t pac1934_current_measurement(pac1934_t *me, pac1934_data_t *data, uint8_t channel)
+
+/**
+ * @brief         PAC1934 init
+ *
+ * @param[in]     me            Pointer to handle of PAC1934 module.
+ * @param[in]     channel       Channel number of PAC1934 module.
+ * @param[in]     data          Power value of PAC1934 module..
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t pac1934_power_measurement(pac1934_t *me, pac1934_data_t *data, uint8_t channel)
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
 } // extern "C"
 #endif
-#endif // __BSP_H
+#endif // __PAC1934_H
 
 /* End of file -------------------------------------------------------- */
