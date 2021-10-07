@@ -1,101 +1,87 @@
 /**
- * @file       bsp.h
- * @copyright  Copyright (C) 2020 Hydratech. All rights reserved.
- * @license    This project is released under the Hydratech License.
+ * @file       bsp_current.h
+ * @copyright  Copyright (C) 2020 HiepLe. All rights reserved.
+ * @license    This project is released under the HiepLe License.
  * @version    1.0.0
- * @date       2021-01-23
- * @author     Thuan Le
- * @brief      Board Support Package (BSP)
+ * @date       2021-10-07
+ * @author     Hiep Le
+ * @brief      Board support package for Multi Channel Power Monitor (PAC1934)
  * @note       None
  * @example    None
  */
 
 /* Define to prevent recursive inclusion ------------------------------ */
-#ifndef __BSP_H
-#define __BSP_H
+#ifndef __BSP_CURRENT_H
+#define __BSP_CURRENT_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ----------------------------------------------------------- */
-#include "platform_common.h"
-#include "bsp_io_10.h"
+#include "pac1934.h"
 
 /* Public defines ----------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------- */
-/**
- * @brief Base status structure
- */
-typedef enum
-{
-  BS_OK = 0x00,
-  BS_ERROR_PARAMS,
-  BS_ERROR
-}
-base_status_t;
-
-/**
- * @brief Bool structure
- */
-typedef enum
-{
-  BS_FALSE = 0x00,
-  BS_TRUE  = 0x01
-}
-bool_t;
-
 /* Public macros ------------------------------------------------------ */
-#define CHECK(expr, ret)            \
-  do {                              \
-    if (!(expr)) {                  \
-      ESP_LOGE(TAG, "%s", #expr);   \
-      return (ret);                 \
-    }                               \
-  } while (0)
-
-#define CHECK_STATUS(expr)          \
-  do {                              \
-    base_status_t ret = (expr);     \
-    if (BS_OK != ret) {             \
-      ESP_LOGE(TAG, "%s", #expr);   \
-      return (ret);                 \
-    }                               \
-  } while (0)
-
 /* Public variables --------------------------------------------------- */
 /* Public function prototypes ----------------------------------------- */
 /**
- * @brief         Board support package init
+ * @brief         BSP Multi Channel Power Monitor sensor init
  *
  * @param[in]     None
  *
  * @attention     None
  *
- * @return        None
+ * @return
+ * - BS_OK
+ * - BS_ERROR
  */
-void bsp_hw_init(void);
+base_status_t bsp_current_init(void);
 
 /**
- * @brief         I2C read
+ * @brief         BSP Multi Channel Power Monitor get voltage
  *
- * @param[in]     slave_addr    Slave address
- * @param[in]     reg_addr      Register address
- * @param[in]     p_data        Pointer to handle of data
- * @param[in]     len           Data length
+ * @param[in]     voltage  Multi Channel Power Monitor voltage
  *
  * @attention     None
  *
  * @return
- * - 0      Succes
- * - 1      Error
+ * - BS_OK
+ * - BS_ERROR
  */
-int bsp_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint8_t *p_data, uint32_t len);
+base_status_t bsp_current_voltage_measurement(pac1934_data_t *voltage, uint8_t channel);
+
+/**
+ * @brief         BSP Multi Channel Power Monitor get current
+ *
+ * @param[in]     current   Multi Channel Power Monitor current
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_current_current_measurement(pac1934_data_t *current, uint8_t channel);
+
+/**
+ * @brief         BSP Multi Channel Power Monitor get power
+ *
+ * @param[in]     power  Multi Channel Power Monitor power
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_current_power_measurement(pac1934_data_t *power, uint8_t channel);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
 } // extern "C"
 #endif
-#endif // __BSP_H
+#endif // __BSP_CURRENT_H
 
 /* End of file -------------------------------------------------------- */

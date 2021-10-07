@@ -1,81 +1,58 @@
 /**
-* @file       bsp.c
-* @copyright  Copyright (C) 2021 ThuanLe. All rights reserved.
-* @license    This project is released under the ThuanLe License.
-* @version    01.00.00
-* @date       2021-03-13
-* @author     ThuanLe
-* @brief      BSP (Board Support Package)
-* @note       None
-* @example    None
-*/
+ * @file       bsp_current.c
+ * @copyright  Copyright (C) 2020 HiepLe. All rights reserved.
+ * @license    This project is released under the HiepLe License.
+ * @version    1.0.0
+ * @date       2021-10-07
+ * @author     Hiep Le
+ * @brief      Board support package for Multi Channel Power Monitor (PAC1934)
+ * @note       None
+ * @example    None
+ */
 
-/* Includes ----------------------------------------------------------------- */
-#include "bsp.h"
+/* Includes ----------------------------------------------------------- */
+#include "bsp_current.h"
 
-/* Private defines ---------------------------------------------------------- */
-static const char *TAG = "BSP";
+/* Private defines ---------------------------------------------------- */
+/* Private enumerate/structure ---------------------------------------- */
+/* Private macros ----------------------------------------------------- */
+/* Public variables --------------------------------------------------- */
+/* Private variables -------------------------------------------------- */
+static pac1934_t m_pac1934;
 
-/* Public variables --------------------------------------------------------- */
-/* Private variables -------------------------------------------------------- */
-/* Private function prototypes ---------------------------------------------- */
-static inline void m_bsp_nvs_init(void);
-static inline void m_bsp_spiffs_init(void);
-
-/* Function definitions ----------------------------------------------------- */
-void bsp_init(void)
+/* Private function prototypes ---------------------------------------- */
+/* Function definitions ----------------------------------------------- */
+base_status_t bsp_current_init(void)
 {
-  m_bsp_nvs_init();
-  m_bsp_spiffs_init();
+  m_pac1934.device_address = PAC1934_I2C_ADDR;
+  m_pac1934.i2c_read       = bsp_i2c_read;
+  m_pac1934.i2c_write      = bsp_i2c_write;
+
+  CHECK_STATUS(pac1934_init(&m_pac1934));
+
+  return BS_OK;
 }
 
-
-/* Private function --------------------------------------------------------- */
-
-
-static inline void m_bsp_nvs_init(void)
+base_status_t bsp_current_voltage_measurement(pac1934_data_t *voltage, uint8_t channel);
 {
-  esp_err_t ret = ESP_OK;
+  CHECK_STATUS(pac1934_voltage_measurement(&m_pac1934, voltage, channel));
 
-  ret = nvs_flash_init();
-  if ((ESP_ERR_NVS_NO_FREE_PAGES == ret) || (ESP_ERR_NVS_NEW_VERSION_FOUND == ret))
-  {
-    ESP_ERROR_CHECK(nvs_flash_erase());
-    ESP_ERROR_CHECK(nvs_flash_init());
-  }
+  return BS_OK;
 }
 
-static inline void m_bsp_spiffs_init(void)
+base_status_t bsp_current_current_measurement(pac1934_data_t *current, uint8_t channel);
 {
-  esp_err_t ret = ESP_OK;
-  ESP_LOGI(TAG, "Initializing SPIFFS");
+  CHECK_STATUS(pac1934_current_measurement(&m_pac1934, current, channel));
 
-  esp_vfs_spiffs_conf_t spiffs_init_cfg = 
-  {
-    .base_path              = "/spiffs",
-    .partition_label        = NULL,
-    .max_files              = 5,
-    .format_if_mount_failed = true
-  };
-  ret = esp_vfs_spiffs_register(&spiffs_init_cfg);
-
-  if (ESP_OK != ret)
-  {
-    ESP_LOGE(TAG, "SPIFFS init failed: %s", esp_err_to_name(ret));
-    return;
-  }
-
-  size_t total = 0, used = 0;
-  ret = esp_spiffs_info(NULL, &total, &used);
-
-  if (ESP_OK == ret)
-  {
-    ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
-  }
-  else
-  {
-    ESP_LOGE(TAG, "SPIFFS get info failed: %s", esp_err_to_name(ret));
-  }
+  return BS_OK;
 }
 
+base_status_t bsp_current_power_measurement(pac1934_data_t *power, uint8_t channel);
+{
+  CHECK_STATUS(pac1934_power_measurement(&m_pac1934, power, channel));
+
+  return BS_OK;
+}
+
+/* Private function definitions ---------------------------------------- */
 /* End of file -------------------------------------------------------- */
