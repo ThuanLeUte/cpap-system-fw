@@ -122,7 +122,7 @@ base_status_t pac1934_voltage_measurement(pac1934_t *me, pac1934_data_t *data, u
 
   if(vbus >= 0x8000)
   {
-    vbus       = ((0xFFFF) - (vbus)) + 1;                //Two's complement 
+    vbus       = ((0xFFFF) - (vbus)) + 1;               //Two's complement 
     data->volt = (double)vbus;                          //Type casting must be done to convert the value into double initially.
     data->volt = (double)((data->volt * 32)/(0xFFFF));  // 0xFFFF is the biggest 28 bit-number to be written.
   }
@@ -159,12 +159,12 @@ base_status_t pac1934_current_measurement(pac1934_t *me, pac1934_data_t *data, u
 
   if(vsense >= 0x8000)  //0x8000 is the smallest negative number that could be written.
   {
-    vsense           = ((0xFFFF) - (vsense)) + 1;                    //Two's complement
+    vsense           = ((0xFFFF) - (vsense)) + 1;                  //Two's complement
     d_vsense         = (double)vsense;
     imax             = (double)(FULLSCALE_RANGE) / (0.004);        // 0.004 :Rsense internal resistor value and 0.1 = 100mV full scale current value.
     rsense           = (FULLSCALE_RANGE) / (imax);                 // I max : maximum current to be measured.
     fullscalecurrent = (FULLSCALE_RANGE) / rsense;
-    data->current    = (fullscalecurrent * d_vsense ) / (0xFFFF);  // iSense: Actual current value.
+    data->current    = (fullscalecurrent * d_vsense ) / (0xFFFF);
   }
   else
   {
@@ -205,7 +205,7 @@ base_status_t pac1934_power_measurement(pac1934_t *me, pac1934_data_t *data, uin
   vpower    <<= 8;
   vpower    |=  tmp_vpower[3];
 
-  if(vpower >= 0x80000000)  //0x8000 is the smallest negative number that could be written.
+  if(vpower >= 0x80000000)
   {
     vpower              = ((0xFFFFFFFF) - (vpower)) + 1;
     d_vpower            = (double)vpower;

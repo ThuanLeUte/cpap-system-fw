@@ -30,10 +30,10 @@ extern "C" {
  */
 typedef struct
 {
-  double	volt;            //Temporary variable used for voltage calculation
-  double 	current;         //Temporary variable used for current calculation
-  double 	power;           //Temporary variable used for power calculation
-  double 	energy;          //Temporary variable used for energy calculation
+  double	volt;
+  double 	current;
+  double 	power;
+  double 	energy;
 }
 pac1934_data_t;
 
