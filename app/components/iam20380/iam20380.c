@@ -1,81 +1,212 @@
 /**
-* @file       bsp.c
-* @copyright  Copyright (C) 2021 ThuanLe. All rights reserved.
-* @license    This project is released under the ThuanLe License.
-* @version    01.00.00
-* @date       2021-03-13
-* @author     ThuanLe
-* @brief      BSP (Board Support Package)
-* @note       None
-* @example    None
-*/
+ * @file       iam20380.c
+ * @copyright  Copyright (C) 2020 Hydratech. All rights reserved.
+ * @license    This project is released under the Hydratech License.
+ * @version    1.0.0
+ * @date       2021-10-08
+ * @author     Hiep Le
+ * @brief      Driver support IAM20380 (Accelerometer)
+ * @note       None
+ * @example    None
+ */
 
-/* Includes ----------------------------------------------------------------- */
-#include "bsp.h"
+/* Includes ----------------------------------------------------------- */
+#include "iam20380.h"
 
-/* Private defines ---------------------------------------------------------- */
-static const char *TAG = "BSP";
+/* Private defines ---------------------------------------------------- */
 
-/* Public variables --------------------------------------------------------- */
-/* Private variables -------------------------------------------------------- */
-/* Private function prototypes ---------------------------------------------- */
-static inline void m_bsp_nvs_init(void);
-static inline void m_bsp_spiffs_init(void);
+// DEFINES IAM20380 REGISTERS
+#define IAM20380_REG_SELF_TEST_X_GYRO            (0X00)
+#define IAM20380_REG_SELF_TEST_Y_GYRO            (0X01)
+#define IAM20380_REG_SELF_TEST_Z_GYRO            (0X02)
+#define IAM20380_REG_XG_OFFS_USRH                (0X13)
+#define IAM20380_REG_XG_OFFS_USRL                (0X14)
+#define IAM20380_REG_YG_OFFS_USRH                (0X15)
+#define IAM20380_REG_YG_OFFS_USRL                (0X16)
+#define IAM20380_REG_ZG_OFFS_USRH                (0X17)
+#define IAM20380_REG_ZG_OFFS_USRL                (0X18)
+#define IAM20380_REG_SMPLRT_DIV                  (0X19)
+#define IAM20380_REG_CONFIG                      (0X1A)
+#define IAM20380_REG_GYRO_CONFIG                 (0X1B)
+#define IAM20380_REG_LP_MODE_CFG                 (0X1E)
+#define IAM20380_REG_FIFO_EN                     (0X23)
+#define IAM20380_REG_FSYNC_INT                   (0X36)
+#define IAM20380_REG_INT_PIN_CFG                 (0X37)
+#define IAM20380_REG_INT_ENABLE                  (0X38)
+#define IAM20380_REG_INT_STATUS                  (0X3A)
+#define IAM20380_REG_TEMP_OUT_H                  (0X41)
+#define IAM20380_REG_TEMP_OUT_L                  (0X42)
+#define IAM20380_REG_GYRO_XOUT_H                 (0X43)
+#define IAM20380_REG_GYRO_XOUT_L                 (0X44)
+#define IAM20380_REG_GYRO_YOUT_H                 (0X45)
+#define IAM20380_REG_GYRO_YOUT_L                 (0X46)
+#define IAM20380_REG_GYRO_ZOUT_H                 (0X47)
+#define IAM20380_REG_GYRO_ZOUT_L                 (0X48)
+#define IAM20380_REG_SIGNAL_PATH_RESET           (0X68)
+#define IAM20380_REG_USER_CTRL                   (0X6A)
+#define IAM20380_REG_PWR_MGMT_1                  (0X6B)
+#define IAM20380_REG_PWR_MGMT_2                  (0X6C)
+#define IAM20380_REG_FIFO_COUNTH                 (0X72)
+#define IAM20380_REG_FIFO_COUNTL                 (0X73)
+#define IAM20380_REG_FIFO_R_W                    (0X74)
+#define IAM20380_REG_WHO_AM_I                    (0X75)
 
-/* Function definitions ----------------------------------------------------- */
-void bsp_init(void)
+// DEFINES IAM20380 IDENTIFIER VALUE
+#define IAM20380_VALUE_IDENTIFIER                (0xB5)
+
+/* Private enumerate/structure ---------------------------------------- */
+/* Private macros ----------------------------------------------------- */
+/* Public variables --------------------------------------------------- */
+/* Private variables -------------------------------------------------- */
+/* Private function prototypes ---------------------------------------- */
+static base_status_t m_iam20380_read_reg(iam20380_t *me, uint8_t reg, uint8_t *p_data, uint32_t len);
+static base_status_t m_iam20380_write_reg(iam20380_t *me, uint8_t reg, uint8_t *p_data, uint32_t len);
+
+static double m_iam20380_modifed_map(double x, double in_min, double in_max,
+                                   double out_min, double out_max);
+
+/* Function definitions ----------------------------------------------- */
+base_status_t iam20380_init(iam20380_t *me)
 {
-  m_bsp_nvs_init();
-  m_bsp_spiffs_init();
+  uint8_t identifier;
+  uint8_t tmp;
+
+  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL))
+    return BS_ERROR;
+
+  // CHECK IDENTITY
+  CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_WHO_AM_I, &identifier, 1));
+  CHECK(IAM20380_VALUE_IDENTIFIER == identifier, BS_ERROR);
+
+  // FULL RESET CHIP
+  tmp = 0x80;
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1));
+  me->delay_ms(50);
+
+  // ENABLE TEMP SENSOR - SET CLOCK TO INTERNAL PLL
+  tmp = 0x01;
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1));
+  me->delay_ms(50);
+
+  // ENABLE GYRO X-Y-Z
+  tmp = 0x00;
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_2, &tmp, 1));
+  me->delay_ms(50);
+
+  // SET SAMPLE RATE AT 1000 HZ AND APLLY A SOFTWARE FILTER
+  tmp = 0x00;
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_SMPLRT_DIV, &tmp, 1));
+  me->delay_ms(50);
+
+  // SET DLPF 20HZ AT SAMPLE RATE 1000 HZ
+  tmp = 0x04;
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_CONFIG, &tmp, 1));
+  me->delay_ms(50);
+
+  // SET SENSIVITY = 2000 DPS
+  tmp = 0x18;
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
+  me->delay_ms(50);
+
+  // ENABLE INTERRUPT WHEN DATA IS READY
+  tmp = 0x01;
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_INT_ENABLE, &tmp, 1));
+  me->delay_ms(50);
+
+  return BS_OK;
 }
 
-
-/* Private function --------------------------------------------------------- */
-
-
-static inline void m_bsp_nvs_init(void)
+base_status_t iam20380_reset(iam20380_t *me)
 {
-  esp_err_t ret = ESP_OK;
+  uint8_t tmp;
 
-  ret = nvs_flash_init();
-  if ((ESP_ERR_NVS_NO_FREE_PAGES == ret) || (ESP_ERR_NVS_NEW_VERSION_FOUND == ret))
-  {
-    ESP_ERROR_CHECK(nvs_flash_erase());
-    ESP_ERROR_CHECK(nvs_flash_init());
-  }
+  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL))
+    return BS_ERROR;
+
+  tmp = 0x80;
+  
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1));
+
+
+  return BS_OK;
 }
 
-static inline void m_bsp_spiffs_init(void)
+base_status_t iam20380_get_raw_data(iam20380_t *me, iam20380_data_t *raw_data)
 {
-  esp_err_t ret = ESP_OK;
-  ESP_LOGI(TAG, "Initializing SPIFFS");
+  uint8_t data[6];
+  uint8_t status;
 
-  esp_vfs_spiffs_conf_t spiffs_init_cfg = 
+  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL))
+    return BS_ERROR;
+
+  CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_INT_STATUS, &status, 1));
+
+  status &= 0x01;
+
+  if (status)
   {
-    .base_path              = "/spiffs",
-    .partition_label        = NULL,
-    .max_files              = 5,
-    .format_if_mount_failed = true
-  };
-  ret = esp_vfs_spiffs_register(&spiffs_init_cfg);
+    CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_GYRO_XOUT_H, &data, sizeof(data)));
 
-  if (ESP_OK != ret)
-  {
-    ESP_LOGE(TAG, "SPIFFS init failed: %s", esp_err_to_name(ret));
-    return;
-  }
-
-  size_t total = 0, used = 0;
-  ret = esp_spiffs_info(NULL, &total, &used);
-
-  if (ESP_OK == ret)
-  {
-    ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
+    raw_data->x = ((data[0] << 8) | data[1]);
+    raw_data->y = ((data[2] << 8) | data[3]);
+    raw_data->z = ((data[4] << 8) | data[5]);
   }
   else
   {
-    ESP_LOGE(TAG, "SPIFFS get info failed: %s", esp_err_to_name(ret));
+    return BS_ERROR;
   }
+
+  return BS_OK;
+}
+
+/* Private function definitions ---------------------------------------- */
+/**
+ * @brief         IAM20380 read register
+ *
+ * @param[in]     me      Pointer to handle of IAM20380 module.
+ * @param[in]     reg     Register
+ * @param[in]     p_data  Pointer to handle of data
+ * @param[in]     len     Data length
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+static base_status_t m_iam20380_read_reg(iam20380_t *me, uint8_t reg, uint8_t *p_data, uint32_t len)
+{
+  CHECK(0 == me->i2c_read(me->device_address, reg, p_data, len), BS_ERROR);
+
+  return BS_OK;
+}
+
+/**
+ * @brief         IAM20380 read register
+ *
+ * @param[in]     me      Pointer to handle of IAM20380 module.
+ * @param[in]     reg     Register
+ * @param[in]     p_data  Pointer to handle of data
+ * @param[in]     len     Data length
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+static base_status_t m_iam20380_write_reg(iam20380_t *me, uint8_t reg, uint8_t *p_data, uint32_t len)
+{
+  CHECK(0 == me->i2c_write(me->device_address, reg, p_data, len), BS_ERROR);
+
+  return BS_OK;
+}
+
+static double m_iam20380_modifed_map(double x, double in_min, double in_max,
+                                   double out_min, double out_max)
+
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 /* End of file -------------------------------------------------------- */
