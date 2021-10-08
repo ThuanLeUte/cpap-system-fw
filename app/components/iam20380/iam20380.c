@@ -62,9 +62,6 @@
 static base_status_t m_iam20380_read_reg(iam20380_t *me, uint8_t reg, uint8_t *p_data, uint32_t len);
 static base_status_t m_iam20380_write_reg(iam20380_t *me, uint8_t reg, uint8_t *p_data, uint32_t len);
 
-static double m_iam20380_modifed_map(double x, double in_min, double in_max,
-                                   double out_min, double out_max);
-
 /* Function definitions ----------------------------------------------- */
 base_status_t iam20380_init(iam20380_t *me)
 {
@@ -103,7 +100,7 @@ base_status_t iam20380_init(iam20380_t *me)
   CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_CONFIG, &tmp, 1));
   me->delay_ms(50);
 
-  // SET SENSIVITY = 2000 DPS
+  // SET FULLSCALE = 2000 DPS
   tmp = 0x18;
   CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
   me->delay_ms(50);
@@ -126,7 +123,6 @@ base_status_t iam20380_reset(iam20380_t *me)
   tmp = 0x80;
   
   CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1));
-
 
   return BS_OK;
 }
@@ -154,6 +150,99 @@ base_status_t iam20380_get_raw_data(iam20380_t *me, iam20380_data_t *raw_data)
   else
   {
     return BS_ERROR;
+  }
+
+  return BS_OK;
+}
+
+base_status_t iam20380_get_gyro_angle(iam20380_t *me, iam20380_data_t *raw_data, iam20380_angle_t *angle)
+{
+  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL))
+    return BS_ERROR;
+
+  CHECK_STATUS(iam20380_get_sensitivity(me));
+
+  angle->x_angle = (float)(raw_data->x) / me->sensitivity;
+  angle->y_angle = (float)(raw_data->y) / me->sensitivity;
+  angle->z_angle = (float)(raw_data->z) / me->sensitivity;
+
+  return BS_OK;
+}
+
+base_status_t iam20380_get_sensitivity(iam20380_t *me)
+{
+  uint8_t data;
+
+  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL))
+    return BS_ERROR;
+
+  CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_GYRO_CONFIG, &data, 1);
+
+  data &= (0x03 << 3);
+  data >>= 3;
+
+  switch (data)
+  {
+    case 0x00:
+      me->sensitivity = 131.0;
+      break;
+
+    case 0x01:
+      me->sensitivity = 65.5;
+      break;
+
+    case 0x02:
+      me->sensitivity = 32.8;  
+      break;
+
+    case 0x03:
+      me->sensitivity = 16.4;
+      break;
+
+    default:
+      break;
+  }
+
+  return BS_OK;
+}
+
+base_status_t iam20380_set_fullscale(iam20380_t *me, iam20380_fullscale_t scale)
+{
+  uint8_t tmp;
+
+  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL))
+    return BS_ERROR;
+
+  switch (scale)
+  {
+    case IAM20380_GYRO_RANGE_250_DPS:
+      CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
+      tmp &= ~((0x03) << 3);
+      CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
+      break;
+
+    case IAM20380_GYRO_RANGE_500_DPS:
+      CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
+      tmp &= ~((0x03) << 3);
+      tmp |= (0x01 << 3);
+      CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
+      break;
+
+    case IAM20380_GYRO_RANGE_1000_DPS:
+      CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
+      tmp &= ~((0x03) << 3);
+      tmp |= (0x02 << 3);
+      CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
+      break;
+
+    case IAM20380_GYRO_RANGE_2000_DPS:
+      CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
+      tmp |= (0x03 << 3);
+      CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
+      break;
+
+    default:
+      break;
   }
 
   return BS_OK;
@@ -200,13 +289,6 @@ static base_status_t m_iam20380_write_reg(iam20380_t *me, uint8_t reg, uint8_t *
   CHECK(0 == me->i2c_write(me->device_address, reg, p_data, len), BS_ERROR);
 
   return BS_OK;
-}
-
-static double m_iam20380_modifed_map(double x, double in_min, double in_max,
-                                   double out_min, double out_max)
-
-{
-  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 /* End of file -------------------------------------------------------- */

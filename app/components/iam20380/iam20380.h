@@ -26,7 +26,7 @@ extern "C" {
 
 /* Public enumerate/structure ----------------------------------------- */
 /**
- * @brief IAM20380 data
+ * @brief IAM20380 raw data
  */
 typedef struct
 {
@@ -37,12 +37,36 @@ typedef struct
 iam20380_data_t;
 
 /**
+ * @brief IAM20380 angle data
+ */
+typedef struct
+{
+  float x_angle;
+  float y_angle;
+  float z_angle;
+}
+iam20380_angle_t;
+
+/**
+ * @brief IAM20380 sensitivity enum
+ */
+typedef enum
+{
+     IAM20380_GYRO_RANGE_250_DPS  = 0X00
+   , IAM20380_GYRO_RANGE_500_DPS  = 0X01
+   , IAM20380_GYRO_RANGE_1000_DPS = 0X02
+   , IAM20380_GYRO_RANGE_2000_DPS = 0X03
+}
+iam20380_fullscale_t;
+
+/**
  * @brief IAM20380 sensor struct
  */
 typedef struct 
 {
   uint8_t  device_address;  // I2C device address
 
+  float sensitivity;        // GYRO SENSITIVITY
   // Read n-bytes from device's internal address <reg_addr> via I2C bus
   int (*i2c_read) (uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len);
 
@@ -67,48 +91,6 @@ iam20380_t;
  * - BS_ERROR
  */
 base_status_t iam20380_init(iam20380_t *me);
-
-/**
- * @brief         IAM20380 init
- *
- * @param[in]     me            Pointer to handle of IAM20380 module.
- * @param[in]     channel       Channel number of IAM20380 module.
- * @param[in]     data          Voltage value of IAM20380 module..
- * @attention     None
- *
- * @return
- * - BS_OK
- * - BS_ERROR
- */
-base_status_t iam20380_voltage_measurement(iam20380_t *me, iam20380_data_t *data, uint8_t channel)
-
-/**
- * @brief         IAM20380 init
- *
- * @param[in]     me            Pointer to handle of IAM20380 module.
- * @param[in]     channel       Channel number of IAM20380 module.
- * @param[in]     data          Current value of IAM20380 module..
- * @attention     None
- *
- * @return
- * - BS_OK
- * - BS_ERROR
- */
-base_status_t iam20380_current_measurement(iam20380_t *me, iam20380_data_t *data, uint8_t channel)
-
-/**
- * @brief         IAM20380 init
- *
- * @param[in]     me            Pointer to handle of IAM20380 module.
- * @param[in]     channel       Channel number of IAM20380 module.
- * @param[in]     data          Power value of IAM20380 module..
- * @attention     None
- *
- * @return
- * - BS_OK
- * - BS_ERROR
- */
-base_status_t iam20380_power_measurement(iam20380_t *me, iam20380_data_t *data, uint8_t channel)
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
