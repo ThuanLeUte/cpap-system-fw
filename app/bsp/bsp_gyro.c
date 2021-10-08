@@ -1,81 +1,73 @@
 /**
-* @file       bsp.c
-* @copyright  Copyright (C) 2021 ThuanLe. All rights reserved.
-* @license    This project is released under the ThuanLe License.
-* @version    01.00.00
-* @date       2021-03-13
-* @author     ThuanLe
-* @brief      BSP (Board Support Package)
-* @note       None
-* @example    None
-*/
+ * @file       bsp_gyro.c
+ * @copyright  Copyright (C) 2020 HiepLe. All rights reserved.
+ * @license    This project is released under the HiepLe License.
+ * @version    1.0.0
+ * @date       2021-10-08
+ * @author     Hiep Le
+ * @brief      Board support package for GyroScope (IAM20380)
+ * @note       None
+ * @example    None
+ */
 
-/* Includes ----------------------------------------------------------------- */
-#include "bsp.h"
+/* Includes ----------------------------------------------------------- */
+#include "bsp_gyro.h"
 
-/* Private defines ---------------------------------------------------------- */
-static const char *TAG = "BSP";
+/* Private defines ---------------------------------------------------- */
+/* Private enumerate/structure ---------------------------------------- */
+/* Private macros ----------------------------------------------------- */
+/* Public variables --------------------------------------------------- */
+/* Private variables -------------------------------------------------- */
+static iam20380_t m_iam20380;
 
-/* Public variables --------------------------------------------------------- */
-/* Private variables -------------------------------------------------------- */
-/* Private function prototypes ---------------------------------------------- */
-static inline void m_bsp_nvs_init(void);
-static inline void m_bsp_spiffs_init(void);
-
-/* Function definitions ----------------------------------------------------- */
-void bsp_init(void)
+/* Private function prototypes ---------------------------------------- */
+/* Function definitions ----------------------------------------------- */
+base_status_t bsp_gyro_init(void)
 {
-  m_bsp_nvs_init();
-  m_bsp_spiffs_init();
+  m_iam20380.device_address = IAM20380_I2C_ADDR;
+  m_iam20380.i2c_read       = bsp_i2c_read;
+  m_iam20380.i2c_write      = bsp_i2c_write;
+  m_iam20380.delay_ms       = bsp_delay_ms;
+
+  CHECK_STATUS(iam20380_init(&m_iam20380));
+
+  return BS_OK;
 }
 
-
-/* Private function --------------------------------------------------------- */
-
-
-static inline void m_bsp_nvs_init(void)
+base_status_t bsp_gyro_reset(void)
 {
-  esp_err_t ret = ESP_OK;
+  CHECK_STATUS(iam20380_reset(&m_iam20380));
 
-  ret = nvs_flash_init();
-  if ((ESP_ERR_NVS_NO_FREE_PAGES == ret) || (ESP_ERR_NVS_NEW_VERSION_FOUND == ret))
-  {
-    ESP_ERROR_CHECK(nvs_flash_erase());
-    ESP_ERROR_CHECK(nvs_flash_init());
-  }
+  return BS_OK;
 }
 
-static inline void m_bsp_spiffs_init(void)
+base_status_t bsp_gyro_get_raw_data(iam20380_data_t *raw_data)
 {
-  esp_err_t ret = ESP_OK;
-  ESP_LOGI(TAG, "Initializing SPIFFS");
+  CHECK_STATUS(iam20380_get_raw_data(&m_iam20380, raw_data));
 
-  esp_vfs_spiffs_conf_t spiffs_init_cfg = 
-  {
-    .base_path              = "/spiffs",
-    .partition_label        = NULL,
-    .max_files              = 5,
-    .format_if_mount_failed = true
-  };
-  ret = esp_vfs_spiffs_register(&spiffs_init_cfg);
-
-  if (ESP_OK != ret)
-  {
-    ESP_LOGE(TAG, "SPIFFS init failed: %s", esp_err_to_name(ret));
-    return;
-  }
-
-  size_t total = 0, used = 0;
-  ret = esp_spiffs_info(NULL, &total, &used);
-
-  if (ESP_OK == ret)
-  {
-    ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
-  }
-  else
-  {
-    ESP_LOGE(TAG, "SPIFFS get info failed: %s", esp_err_to_name(ret));
-  }
+  return BS_OK;
 }
 
+base_status_t bsp_gyro_get_gyro_angle(iam20380_data_t *raw_data, iam20380_angle_t *angle)
+{
+  CHECK_STATUS(iam20380_get_gyro_angle(&m_iam20380, raw_data, angle));
+
+  return BS_OK;
+}
+
+base_status_t bsp_gyro_get_sensitivity(void)
+{
+  CHECK_STATUS(iam20380_get_sensitivity(&m_iam20380));
+
+  return BS_OK; 
+}
+
+base_status_t bsp_gyro_set_fullscale(iam20380_fullscale_t scale)
+{
+  CHECK_STATUS(iam20380_set_fullscale(&m_iam20380, scale));
+
+  return BS_OK; 
+}
+
+/* Private function definitions ---------------------------------------- */
 /* End of file -------------------------------------------------------- */

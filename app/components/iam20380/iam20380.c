@@ -161,6 +161,7 @@ base_status_t iam20380_get_gyro_angle(iam20380_t *me, iam20380_data_t *raw_data,
     return BS_ERROR;
 
   CHECK_STATUS(iam20380_get_sensitivity(me));
+  CHECK_STATUS(iam20380_get_raw_data(me, raw_data));
 
   angle->x_angle = (float)(raw_data->x) / me->sensitivity;
   angle->y_angle = (float)(raw_data->y) / me->sensitivity;

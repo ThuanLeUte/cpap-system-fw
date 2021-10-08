@@ -22,7 +22,7 @@ extern "C" {
 #include "bsp.h"
 
 /* Public defines ----------------------------------------------------- */
-#define IAM20380_I2C_ADDR                       (0x11) // 7 Bits
+#define IAM20380_I2C_ADDR                       (0x68) // 7 Bits
 
 /* Public enumerate/structure ----------------------------------------- */
 /**
@@ -91,6 +91,72 @@ iam20380_t;
  * - BS_ERROR
  */
 base_status_t iam20380_init(iam20380_t *me);
+
+/**
+ * @brief         IAM20380 reset
+ *
+ * @param[in]     me      Pointer to handle of IAM20380 module.
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t iam20380_reset(iam20380_t *me)
+
+/**
+ * @brief         IAM20380 read raw data
+ *
+ * @param[in]     me            Pointer to handle of IAM20380 module.
+ * @param[in]     raw_data      IAM20380 raw data
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t iam20380_get_raw_data(iam20380_t *me, iam20380_data_t *raw_data)
+
+/**
+ * @brief         IAM20380 calculate gyro angle
+ *
+ * @param[in]     me            Pointer to handle of IAM20380 module.
+ * @param[in]     raw_data      IAM20380 raw data
+ * @param[in]     angle         gyro angle
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t iam20380_get_gyro_angle(iam20380_t *me, iam20380_data_t *raw_data, iam20380_angle_t *angle)
+
+/**
+ * @brief         IAM20380 get sensitivity
+ *
+ * @param[in]     me            Pointer to handle of IAM20380 module.
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t iam20380_get_sensitivity(iam20380_t *me)
+
+/**
+ * @brief         IAM20380 set fullscale
+ *
+ * @param[in]     me            Pointer to handle of IAM20380 module.
+ * @param[in]     scale         IAM20380 scale
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t iam20380_set_fullscale(iam20380_t *me, iam20380_fullscale_t scale)
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus

@@ -1,101 +1,114 @@
 /**
- * @file       bsp.h
- * @copyright  Copyright (C) 2020 Hydratech. All rights reserved.
- * @license    This project is released under the Hydratech License.
+ * @file       bsp_gyro.h
+ * @copyright  Copyright (C) 2020 HiepLe. All rights reserved.
+ * @license    This project is released under the HiepLe License.
  * @version    1.0.0
- * @date       2021-01-23
- * @author     Thuan Le
- * @brief      Board Support Package (BSP)
+ * @date       2021-10-07
+ * @author     Hiep Le
+ * @brief      Board support package for GyroScope
  * @note       None
  * @example    None
  */
 
 /* Define to prevent recursive inclusion ------------------------------ */
-#ifndef __BSP_H
-#define __BSP_H
+#ifndef __BSP_GYRO_H
+#define __BSP_GYRO_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ----------------------------------------------------------- */
-#include "platform_common.h"
-#include "bsp_io_10.h"
+#include "bsp_gyro.h"
 
 /* Public defines ----------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------- */
-/**
- * @brief Base status structure
- */
-typedef enum
-{
-  BS_OK = 0x00,
-  BS_ERROR_PARAMS,
-  BS_ERROR
-}
-base_status_t;
-
-/**
- * @brief Bool structure
- */
-typedef enum
-{
-  BS_FALSE = 0x00,
-  BS_TRUE  = 0x01
-}
-bool_t;
-
 /* Public macros ------------------------------------------------------ */
-#define CHECK(expr, ret)            \
-  do {                              \
-    if (!(expr)) {                  \
-      ESP_LOGE(TAG, "%s", #expr);   \
-      return (ret);                 \
-    }                               \
-  } while (0)
-
-#define CHECK_STATUS(expr)          \
-  do {                              \
-    base_status_t ret = (expr);     \
-    if (BS_OK != ret) {             \
-      ESP_LOGE(TAG, "%s", #expr);   \
-      return (ret);                 \
-    }                               \
-  } while (0)
-
 /* Public variables --------------------------------------------------- */
 /* Public function prototypes ----------------------------------------- */
 /**
- * @brief         Board support package init
+ * @brief         BSP GyroScope init
  *
- * @param[in]     None
- *
- * @attention     None
- *
- * @return        None
- */
-void bsp_hw_init(void);
-
-/**
- * @brief         I2C read
- *
- * @param[in]     slave_addr    Slave address
- * @param[in]     reg_addr      Register address
- * @param[in]     p_data        Pointer to handle of data
- * @param[in]     len           Data length
+ * @param[in]     me      Pointer to handle of GyroScope module.
  *
  * @attention     None
  *
  * @return
- * - 0      Succes
- * - 1      Error
+ * - BS_OK
+ * - BS_ERROR
  */
-int bsp_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint8_t *p_data, uint32_t len);
+base_status_t bsp_gyro_init(void);
+
+/**
+ * @brief         BSP GyroScope reset
+ *
+ * @param[in]     me      Pointer to handle of GyroScope module.
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_gyro_reset(void)
+
+/**
+ * @brief         BSP GyroScope read raw data
+ *
+ * @param[in]     me            Pointer to handle of GyroScope module.
+ * @param[in]     raw_data      GyroScope raw data
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_gyro_get_raw_data(iam20380_data_t *raw_data)
+
+/**
+ * @brief         BSP GyroScope calculate gyro angle
+ *
+ * @param[in]     me            Pointer to handle of GyroScope module.
+ * @param[in]     raw_data      GyroScope raw data
+ * @param[in]     angle         GyroScope angle
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_gyro_get_gyro_angle(iam20380_data_t *raw_data, iam20380_angle_t *angle)
+
+/**
+ * @brief         BSP GyroScope get sensitivity
+ *
+ * @param[in]     me            Pointer to handle of GyroScope module.
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_gyro_get_sensitivity(void)
+
+/**
+ * @brief         BSP GyroScope set fullscale
+ *
+ * @param[in]     me            Pointer to handle of GyroScope module.
+ * @param[in]     scale         GyroScope scale
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_gyro_set_fullscale(iam20380_fullscale_t scale)
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
 } // extern "C"
 #endif
-#endif // __BSP_H
+#endif // __BSP_GYRO_H
 
 /* End of file -------------------------------------------------------- */

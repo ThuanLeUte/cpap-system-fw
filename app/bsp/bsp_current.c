@@ -27,7 +27,7 @@ base_status_t bsp_current_init(void)
   m_pac1934.device_address = PAC1934_I2C_ADDR;
   m_pac1934.i2c_read       = bsp_i2c_read;
   m_pac1934.i2c_write      = bsp_i2c_write;
-
+  m_pac1934.delay_ms       = bsp_delay_ms;
   CHECK_STATUS(pac1934_init(&m_pac1934));
 
   return BS_OK;
