@@ -1,101 +1,82 @@
 /**
- * @file       bsp.h
+ * @file       drv10975.h
  * @copyright  Copyright (C) 2020 Hydratech. All rights reserved.
  * @license    This project is released under the Hydratech License.
  * @version    1.0.0
- * @date       2021-01-23
- * @author     Thuan Le
- * @brief      Board Support Package (BSP)
+ * @date       2021-10-09
+ * @author     Hiep Le
+ * @brief      Driver support DRV10975 (Multi Channel Power Monitor)
  * @note       None
  * @example    None
  */
 
 /* Define to prevent recursive inclusion ------------------------------ */
-#ifndef __BSP_H
-#define __BSP_H
+#ifndef __DRV10975_H
+#define __DRV10975_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ----------------------------------------------------------- */
-#include "platform_common.h"
-#include "bsp_io_10.h"
+#include "bsp.h"
 
 /* Public defines ----------------------------------------------------- */
+#define DRV10975_I2C_ADDR                       (0x52) // 7 Bits
+
 /* Public enumerate/structure ----------------------------------------- */
 /**
- * @brief Base status structure
+ * @brief DRV10975 data
  */
-typedef enum
+typedef struct
 {
-  BS_OK = 0x00,
-  BS_ERROR_PARAMS,
-  BS_ERROR
+  float motor_frequency;
+  float motor_period;
+  float motor_current;
+  float motor_supply_voltage;
 }
-base_status_t;
+drv10975_data_t;
 
 /**
- * @brief Bool structure
+ * @brief DRV10975 struct
  */
-typedef enum
+typedef struct 
 {
-  BS_FALSE = 0x00,
-  BS_TRUE  = 0x01
+  uint8_t  device_address;  // I2C device address
+
+  uint16_t motor_speed;
+
+  // Read n-bytes from device's internal address <reg_addr> via I2C bus
+  int (*i2c_read) (uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len);
+
+  // Write n-bytes from device's internal address <reg_addr> via I2C bus
+  int (*i2c_write) (uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len);
+
+  // delay a time period in milisecond 
+  int (*delay_ms) (uint32_t ms);
 }
-bool_t;
+drv10975_t;
 
-/* Public macros ------------------------------------------------------ */
-#define CHECK(expr, ret)            \
-  do {                              \
-    if (!(expr)) {                  \
-      ESP_LOGE(TAG, "%s", #expr);   \
-      return (ret);                 \
-    }                               \
-  } while (0)
-
-#define CHECK_STATUS(expr)          \
-  do {                              \
-    base_status_t ret = (expr);     \
-    if (BS_OK != ret) {             \
-      ESP_LOGE(TAG, "%s", #expr);   \
-      return (ret);                 \
-    }                               \
-  } while (0)
-
-/* Public variables --------------------------------------------------- */
 /* Public function prototypes ----------------------------------------- */
 /**
- * @brief         Board support package init
+ * @brief         DRV10975 init
  *
- * @param[in]     None
- *
- * @attention     None
- *
- * @return        None
- */
-void bsp_hw_init(void);
-
-/**
- * @brief         I2C read
- *
- * @param[in]     slave_addr    Slave address
- * @param[in]     reg_addr      Register address
- * @param[in]     p_data        Pointer to handle of data
- * @param[in]     len           Data length
+ * @param[in]     me      Pointer to handle of DRV10975 module.
  *
  * @attention     None
  *
  * @return
- * - 0      Succes
- * - 1      Error
+ * - BS_OK
+ * - BS_ERROR
  */
-int bsp_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint8_t *p_data, uint32_t len);
+base_status_t drv10975_init(drv10975_t *me);
+
+
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
 } // extern "C"
 #endif
-#endif // __BSP_H
+#endif // __DRV10975_H
 
 /* End of file -------------------------------------------------------- */

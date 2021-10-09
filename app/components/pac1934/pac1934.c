@@ -230,9 +230,9 @@ base_status_t pac1934_power_measurement(pac1934_t *me, pac1934_data_t *data, uin
 
 /* Private function definitions ---------------------------------------- */
 /**
- * @brief         MIS2DH read register
+ * @brief         PAC1934 read register
  *
- * @param[in]     me      Pointer to handle of MIS2DH module.
+ * @param[in]     me      Pointer to handle of PAC1934 module.
  * @param[in]     reg     Register
  * @param[in]     p_data  Pointer to handle of data
  * @param[in]     len     Data length
@@ -251,9 +251,9 @@ static base_status_t m_pac1934_read_reg(pac1934_t *me, uint8_t reg, uint8_t *p_d
 }
 
 /**
- * @brief         MIS2DH read register
+ * @brief         PAC1934 read register
  *
- * @param[in]     me      Pointer to handle of MIS2DH module.
+ * @param[in]     me      Pointer to handle of PAC1934 module.
  * @param[in]     reg     Register
  * @param[in]     p_data  Pointer to handle of data
  * @param[in]     len     Data length
