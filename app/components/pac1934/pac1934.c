@@ -14,7 +14,7 @@
 #include "pac1934.h"
 
 /* Private defines ---------------------------------------------------- */
-// DEFINES PAC1934 REGISTERS
+// PAC1934 resgisters
 #define PAC1934_REG_REFRESH          (0x00)
 #define PAC1934_REG_PAC_CTRL         (0x01)
 #define PAC1934_REG_ACC_COUNT        (0x02)
@@ -57,12 +57,7 @@
 #define PAC1934_REG_MID              (0XFE)
 #define PAC1934_REG_REV              (0XFF)
 
-// DEFINES PAC1934 READ/WRITE I2C ADDRESS
-#define PAC1934_I2C_ADDR_WRITE	     (0x22)
-#define PAC1934_I2C_ADDR_READ        (0x23)
-
-// DEFINES PAC1934 FULLSCALE RANGE
-#define FULLSCALE_RANGE               0.1f
+#define FULLSCALE_RANGE              (0.1f)
 
 /* Private enumerate/structure ---------------------------------------- */
 /* Private macros ----------------------------------------------------- */
@@ -70,72 +65,58 @@
 /* Private variables -------------------------------------------------- */
 /* Private function prototypes ---------------------------------------- */
 static base_status_t m_pac1934_read_reg(pac1934_t *me, uint8_t reg, uint8_t *p_data, uint32_t len);
-static base_status_t m_pac1934_write_reg(pac1934_t *me, uint8_t reg, uint8_t *p_data, uint32_t len);
+static base_status_t m_pac1934_write_reg(pac1934_t *me, uint8_t reg, uint8_t data);
+static base_status_t m_pac1934_refresh(pac1934_t *me);
 
 /* Function definitions ----------------------------------------------- */
 base_status_t pac1934_init(pac1934_t *me)
 {
-  uint8_t tmp;
+  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL) || (me->delay_ms == NULL))
+    return BS_ERROR_PARAMS;
 
-  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL))
-    return BS_ERROR;
+  CHECK_STATUS(m_pac1934_refresh);
 
-  tmp = NULL;
-  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_REFRESH, &tmp, 1));
-  me->delay_ms(100);
-
-  tmp = 0x00;
-  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_PAC_CTRL, &tmp, 1));
+  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_PAC_CTRL, 0x00));
   
-  tmp = 0xFF;
-  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_NEG_PWR, &tmp, 1));
+  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_NEG_PWR, 0xFF));
 
-  tmp = 0x00;
-  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_CHANNEL_DIS, &tmp, 1));
+  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_CHANNEL_DIS, 0x00));
 
-  tmp = 0x00;
-  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_SLOW, &tmp, 1));
+  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_SLOW, 0x00));
 
-  tmp = NULL;
-  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_REFRESH, &tmp, 1));
-  me->delay_ms(100);
+  CHECK_STATUS(m_pac1934_refresh);
 
   return BS_OK;
 }
 
-base_status_t pac1934_voltage_measurement(pac1934_t *me, pac1934_data_t *data, uint8_t channel)
+base_status_t pac1934_voltage_measurement(pac1934_t *me, pac1934_channel_t channel)
 {
   uint8_t   register_addr;
   uint8_t   tmp_vbus[2];
-  uint16_t  vbus;  
+  uint16_t  vbus;
 
-  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL))
-    return BS_ERROR;
+  register_addr = channel + PAC1934_REG_VBUS1;   // Vpower registers addresses begin with 0x07.
 
-  register_addr = channel + 0x06;   // vpower registers addresses begin with 0x07.
+  CHECK_STATUS(m_pac1934_read_reg(me, register_addr, tmp_vbus, sizeof(tmp_vbus)));
 
-  CHECK_STATUS(m_pac1934_read_reg(me, register_addr, &tmp_vbus[0], sizeof(tmp_vbus)));
-
-  vbus   =   tmp_vbus[0];
-  vbus   <<= 8;
-  vbus   |=  tmp_vbus[1];
+  vbus = tmp_vbus[1] | (tmp_vbus[0] << 8);
 
   if(vbus >= 0x8000)
   {
-    vbus       = ((0xFFFF) - (vbus)) + 1;               //Two's complement 
-    data->volt = (double)vbus;                          //Type casting must be done to convert the value into double initially.
-    data->volt = (double)((data->volt * 32)/(0xFFFF));  // 0xFFFF is the biggest 28 bit-number to be written.
+    vbus          = ((0xFFFF) - (vbus)) + 1;                 // Two's complement
+    me->data.volt = (double)vbus;                            // Type casting must be done to convert the value into double initially.
+    me->data.volt = (double)((data->volt * 32) / (0xFFFF));  // 0xFFFF is the biggest 28 bit-number to be written.
   }
   else
-  { 
-    data->volt = (double)vbus;
-    data->volt = (double)((data->volt * 32)/(0x7FFF));  // 0x7FFF is the biggest 27 bit-number to be written.
+  {
+    me->data.volt = (double)vbus;
+    me->data.volt = (double)((data->volt * 32) / (0x7FFF)); // 0x7FFF is the biggest 27 bit-number to be written.
   }
 
   return BS_OK;
 }
 
-base_status_t pac1934_current_measurement(pac1934_t *me, pac1934_data_t *data, uint8_t channel)
+base_status_t pac1934_current_measurement(pac1934_t *me, pac1934_channel_t channel)
 {
   uint8_t   register_addr;
   uint8_t   tmp_vsense[2];
@@ -144,27 +125,22 @@ base_status_t pac1934_current_measurement(pac1934_t *me, pac1934_data_t *data, u
   double    isense;
   double    imax;
   double    rsense;
-  double    fullscalecurrent;  
+  double    fullscalecurrent;
 
-  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL))
-    return BS_ERROR;
+  register_addr = channel + PAC1934_REG_VSENSE1;   // Vpower registers addresses begin with 0x0B.
 
-  register_addr = channel + 0x0A;   // vpower registers addresses begin with 0x0B.
+  CHECK_STATUS(m_pac1934_read_reg(me, register_addr, tmp_vsense, sizeof(tmp_vsense)));
 
-  CHECK_STATUS(m_pac1934_read_reg(me, register_addr, &tmp_vsense[0], sizeof(tmp_vsense)));
+  vsense = tmp_vsense[1] | (tmp_vsense[0] << 8);
 
-  vsense   =   tmp_vsense[0];
-  vsense   <<= 8;
-  vsense   |=  tmp_vsense[1];
-
-  if(vsense >= 0x8000)  //0x8000 is the smallest negative number that could be written.
+  if(vsense >= 0x8000)  // 0x8000 is the smallest negative number that could be written.
   {
-    vsense           = ((0xFFFF) - (vsense)) + 1;                  //Two's complement
+    vsense           = ((0xFFFF) - (vsense)) + 1;                 // Two's complement
     d_vsense         = (double)vsense;
-    imax             = (double)(FULLSCALE_RANGE) / (0.004);        // 0.004 :Rsense internal resistor value and 0.1 = 100mV full scale current value.
-    rsense           = (FULLSCALE_RANGE) / (imax);                 // I max : maximum current to be measured.
+    imax             = (double)(FULLSCALE_RANGE) / (0.004);       // 0.004 : Rsense internal resistor value and 0.1 = 100mV full scale current value.
+    rsense           = (FULLSCALE_RANGE) / (imax);                // I max : maximum current to be measured.
     fullscalecurrent = (FULLSCALE_RANGE) / rsense;
-    data->current    = (fullscalecurrent * d_vsense ) / (0xFFFF);
+    me->data.current = (fullscalecurrent * d_vsense) / (0xFFFF);
   }
   else
   {
@@ -172,13 +148,13 @@ base_status_t pac1934_current_measurement(pac1934_t *me, pac1934_data_t *data, u
     imax             = (double)(FULLSCALE_RANGE) / (0.004);
     rsense           = (FULLSCALE_RANGE) / (imax);
     fullscalecurrent = (FULLSCALE_RANGE) / rsense;
-    data->current    = (fullscalecurrent * d_vsense ) / (0x7FFF);
+    me->data.current = (fullscalecurrent * d_vsense) / (0x7FFF);
   }
 
   return BS_OK;
 }
 
-base_status_t pac1934_power_measurement(pac1934_t *me, pac1934_data_t *data, uint8_t channel)
+base_status_t pac1934_power_measurement(pac1934_t *me, pac1934_channel_t channel)
 {
   uint8_t   register_addr;
   uint8_t   tmp_vpower[4];
@@ -190,20 +166,11 @@ base_status_t pac1934_power_measurement(pac1934_t *me, pac1934_data_t *data, uin
   double    fullscalerangepower; 
   double    proppower;
 
-  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL))
-    return BS_ERROR;
+  register_addr = channel + PAC1934_REG_VPOWER1;   // Vpower registers addresses begin with 0x17.
 
-  register_addr = channel + 0x16;   // vpower registers addresses begin with 0x17.
+  CHECK_STATUS(m_pac1934_read_reg(me, register_addr, tmp_vpower, sizeof(tmp_vpower)));
 
-  CHECK_STATUS(m_pac1934_read_reg(me, register_addr, &tmp_vpower[0], sizeof(tmp_vpower)));
-
-  vpower    =   tmp_vpower[0];
-  vpower    <<= 8;
-  vpower    |=  tmp_vpower[1];
-  vpower    <<= 8;
-  vpower    |=  tmp_vpower[2];
-  vpower    <<= 8;
-  vpower    |=  tmp_vpower[3];
+  vpower |= tmp_vpower[3] | (tmp_vpower[2] << 8) || (tmp_vpower[1] << 16) || (tmp_vpower[0] << 24);
 
   if(vpower >= 0x80000000)
   {
@@ -213,16 +180,16 @@ base_status_t pac1934_power_measurement(pac1934_t *me, pac1934_data_t *data, uin
     rsense              = (FULLSCALE_RANGE) / (imax);
     fullscalerangepower = (double)(((FULLSCALE_RANGE) / (rsense)) * 32);
     proppower           = (d_vpower / (0xFFFFFFF0);
-    data->power         = (fullscalerangepower * proppower);
+    me->data.power      = (fullscalerangepower * proppower);
   }
   else
   {
     d_vpower            = (double)vpower;
     imax                = (double)(FULLSCALE_RANGE) / (0.004);
     rsense              = (FULLSCALE_RANGE) / (imax);
-    fullscalerangepower = (double)(( (FULLSCALE_RANGE) / (rsense)) * 32);
-    proppower           = (d_vpower / 0x7FFFFFF0); 
-    data->power         = (fullscalerangepower * proppower);
+    fullscalerangepower = (double)(((FULLSCALE_RANGE) / (rsense)) * 32);
+    proppower           = (d_vpower / 0x7FFFFFF0);
+    me->data.power      = (fullscalerangepower * proppower);
   }
 
   return BS_OK;
@@ -251,12 +218,11 @@ static base_status_t m_pac1934_read_reg(pac1934_t *me, uint8_t reg, uint8_t *p_d
 }
 
 /**
- * @brief         PAC1934 read register
+ * @brief         PAC1934 write register
  *
  * @param[in]     me      Pointer to handle of PAC1934 module.
  * @param[in]     reg     Register
- * @param[in]     p_data  Pointer to handle of data
- * @param[in]     len     Data length
+ * @param[in]     data    Data
  *
  * @attention     None
  *
@@ -264,9 +230,28 @@ static base_status_t m_pac1934_read_reg(pac1934_t *me, uint8_t reg, uint8_t *p_d
  * - BS_OK
  * - BS_ERROR
  */
-static base_status_t m_pac1934_write_reg(pac1934_t *me, uint8_t reg, uint8_t *p_data, uint32_t len)
+static base_status_t m_pac1934_write_reg(pac1934_t *me, uint8_t reg, uint8_t data)
 {
-  CHECK(0 == me->i2c_write(me->device_address, reg, p_data, len), BS_ERROR);
+  CHECK(0 == me->i2c_write(me->device_address, reg, &data, 1), BS_ERROR);
+
+  return BS_OK;
+}
+
+/**
+ * @brief         PAC1934 refesh
+ *
+ * @param[in]     me      Pointer to handle of PAC1934 module.
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+static base_status_t m_pac1934_refresh(pac1934_t *me)
+{
+  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_REFRESH, 0x00);
+  me->delay_ms(100);
 
   return BS_OK;
 }

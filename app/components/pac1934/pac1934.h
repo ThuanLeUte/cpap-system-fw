@@ -30,19 +30,33 @@ extern "C" {
  */
 typedef struct
 {
-  double	volt;
-  double 	current;
-  double 	power;
-  double 	energy;
+  double volt;
+  double current;
+  double power;
+  double energy;
 }
 pac1934_data_t;
+
+/**
+ * @brief PAC1934 channels enum
+ */
+typedef enum
+{
+   PAC1934_CHANNEL_1 = 0
+  ,PAC1934_CHANNEL_2
+  ,PAC1934_CHANNEL_3
+  ,PAC1934_CHANNEL_4
+}
+pac1934_channel_t;
 
 /**
  * @brief PAC1934 sensor struct
  */
 typedef struct 
 {
-  uint8_t  device_address;  // I2C device address
+  uint8_t device_address;  // I2C device address
+
+  pac1934_data_t data;     // PAC1934 data
 
   // Read n-bytes from device's internal address <reg_addr> via I2C bus
   int (*i2c_read) (uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len);
@@ -50,8 +64,8 @@ typedef struct
   // Write n-bytes from device's internal address <reg_addr> via I2C bus
   int (*i2c_write) (uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len);
 
-  // delay a time period in milisecond 
-  int (*delay_ms) (uint32_t ms);
+  // Delay a time period in milisecond
+  void (*delay_ms) (uint32_t ms);
 }
 pac1934_t;
 
@@ -74,42 +88,42 @@ base_status_t pac1934_init(pac1934_t *me);
  *
  * @param[in]     me            Pointer to handle of PAC1934 module.
  * @param[in]     channel       Channel number of PAC1934 module.
- * @param[in]     data          Voltage value of PAC1934 module..
+ * 
  * @attention     None
  *
  * @return
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t pac1934_voltage_measurement(pac1934_t *me, pac1934_data_t *data, uint8_t channel)
+base_status_t pac1934_voltage_measurement(pac1934_t *me, pac1934_channel_t channel)
 
 /**
  * @brief         PAC1934 init
  *
  * @param[in]     me            Pointer to handle of PAC1934 module.
  * @param[in]     channel       Channel number of PAC1934 module.
- * @param[in]     data          Current value of PAC1934 module..
+ * 
  * @attention     None
  *
  * @return
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t pac1934_current_measurement(pac1934_t *me, pac1934_data_t *data, uint8_t channel)
+base_status_t pac1934_current_measurement(pac1934_t *me, pac1934_channel_t channel)
 
 /**
  * @brief         PAC1934 init
  *
  * @param[in]     me            Pointer to handle of PAC1934 module.
  * @param[in]     channel       Channel number of PAC1934 module.
- * @param[in]     data          Power value of PAC1934 module..
+ * 
  * @attention     None
  *
  * @return
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t pac1934_power_measurement(pac1934_t *me, pac1934_data_t *data, uint8_t channel)
+base_status_t pac1934_power_measurement(pac1934_t *me, pac1934_channel_t channel)
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
