@@ -74,7 +74,7 @@ base_status_t pac1934_init(pac1934_t *me)
   if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL) || (me->delay_ms == NULL))
     return BS_ERROR_PARAMS;
 
-  CHECK_STATUS(m_pac1934_refresh);
+  CHECK_STATUS(m_pac1934_refresh(me));
 
   CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_PAC_CTRL, 0x00));
   
@@ -84,7 +84,7 @@ base_status_t pac1934_init(pac1934_t *me)
 
   CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_SLOW, 0x00));
 
-  CHECK_STATUS(m_pac1934_refresh);
+  CHECK_STATUS(m_pac1934_refresh(me));
 
   return BS_OK;
 }
@@ -99,18 +99,16 @@ base_status_t pac1934_voltage_measurement(pac1934_t *me, pac1934_channel_t chann
 
   CHECK_STATUS(m_pac1934_read_reg(me, register_addr, tmp_vbus, sizeof(tmp_vbus)));
 
-  vbus = tmp_vbus[1] | (tmp_vbus[0] << 8);
+  vbus =  (tmp_vbus[0] << 8) | tmp_vbus[1];
 
   if(vbus >= 0x8000)
   {
-    vbus          = ((0xFFFF) - (vbus)) + 1;                 // Two's complement
-    me->data.volt = (double)vbus;                            // Type casting must be done to convert the value into double initially.
-    me->data.volt = (double)((data->volt * 32) / (0xFFFF));  // 0xFFFF is the biggest 28 bit-number to be written.
+    vbus          = ((0xFFFF) - (vbus)) + 1;           // Two's complement
+    me->data.volt = (double)((vbus * 32) / (0xFFFF));  // 0xFFFF is the biggest 28 bit-number to be written.
   }
   else
   {
-    me->data.volt = (double)vbus;
-    me->data.volt = (double)((data->volt * 32) / (0x7FFF)); // 0x7FFF is the biggest 27 bit-number to be written.
+    me->data.volt = (double)((vbus * 32) / (0x7FFF));  // 0x7FFF is the biggest 27 bit-number to be written.
   }
 
   return BS_OK;
@@ -131,23 +129,21 @@ base_status_t pac1934_current_measurement(pac1934_t *me, pac1934_channel_t chann
 
   CHECK_STATUS(m_pac1934_read_reg(me, register_addr, tmp_vsense, sizeof(tmp_vsense)));
 
-  vsense = tmp_vsense[1] | (tmp_vsense[0] << 8);
+  vsense = (tmp_vsense[0] << 8) | tmp_vsense[1];
+
+  imax             = (double)(FULLSCALE_RANGE) / (0.004);       // 0.004 : Rsense internal resistor value and 0.1 = 100mV full scale current value.
+  rsense           = (FULLSCALE_RANGE) / (imax);                // I max : maximum current to be measured.
+  fullscalecurrent = (FULLSCALE_RANGE) / rsense;
 
   if(vsense >= 0x8000)  // 0x8000 is the smallest negative number that could be written.
   {
     vsense           = ((0xFFFF) - (vsense)) + 1;                 // Two's complement
     d_vsense         = (double)vsense;
-    imax             = (double)(FULLSCALE_RANGE) / (0.004);       // 0.004 : Rsense internal resistor value and 0.1 = 100mV full scale current value.
-    rsense           = (FULLSCALE_RANGE) / (imax);                // I max : maximum current to be measured.
-    fullscalecurrent = (FULLSCALE_RANGE) / rsense;
     me->data.current = (fullscalecurrent * d_vsense) / (0xFFFF);
   }
   else
   {
     d_vsense         = (double)vsense;
-    imax             = (double)(FULLSCALE_RANGE) / (0.004);
-    rsense           = (FULLSCALE_RANGE) / (imax);
-    fullscalecurrent = (FULLSCALE_RANGE) / rsense;
     me->data.current = (fullscalecurrent * d_vsense) / (0x7FFF);
   }
 
@@ -170,24 +166,22 @@ base_status_t pac1934_power_measurement(pac1934_t *me, pac1934_channel_t channel
 
   CHECK_STATUS(m_pac1934_read_reg(me, register_addr, tmp_vpower, sizeof(tmp_vpower)));
 
-  vpower |= tmp_vpower[3] | (tmp_vpower[2] << 8) || (tmp_vpower[1] << 16) || (tmp_vpower[0] << 24);
+  vpower |= (tmp_vpower[0] << 24) || (tmp_vpower[1] << 16) || (tmp_vpower[2] << 8) || tmp_vpower[3];
 
+  imax                = (double)(FULLSCALE_RANGE) / (0.004);
+  rsense              = (FULLSCALE_RANGE) / (imax);
+  fullscalerangepower = (double)(((FULLSCALE_RANGE) / (rsense)) * 32);
+  
   if(vpower >= 0x80000000)
   {
     vpower              = ((0xFFFFFFFF) - (vpower)) + 1;
     d_vpower            = (double)vpower;
-    imax                = (double)(FULLSCALE_RANGE) / (0.004);
-    rsense              = (FULLSCALE_RANGE) / (imax);
-    fullscalerangepower = (double)(((FULLSCALE_RANGE) / (rsense)) * 32);
     proppower           = (d_vpower / (0xFFFFFFF0);
     me->data.power      = (fullscalerangepower * proppower);
   }
   else
   {
     d_vpower            = (double)vpower;
-    imax                = (double)(FULLSCALE_RANGE) / (0.004);
-    rsense              = (FULLSCALE_RANGE) / (imax);
-    fullscalerangepower = (double)(((FULLSCALE_RANGE) / (rsense)) * 32);
     proppower           = (d_vpower / 0x7FFFFFF0);
     me->data.power      = (fullscalerangepower * proppower);
   }

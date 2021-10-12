@@ -84,7 +84,7 @@ pac1934_t;
 base_status_t pac1934_init(pac1934_t *me);
 
 /**
- * @brief         PAC1934 init
+ * @brief         PAC1934 measure voltage
  *
  * @param[in]     me            Pointer to handle of PAC1934 module.
  * @param[in]     channel       Channel number of PAC1934 module.
@@ -98,7 +98,7 @@ base_status_t pac1934_init(pac1934_t *me);
 base_status_t pac1934_voltage_measurement(pac1934_t *me, pac1934_channel_t channel)
 
 /**
- * @brief         PAC1934 init
+ * @brief         PAC1934 measure current
  *
  * @param[in]     me            Pointer to handle of PAC1934 module.
  * @param[in]     channel       Channel number of PAC1934 module.
@@ -112,7 +112,7 @@ base_status_t pac1934_voltage_measurement(pac1934_t *me, pac1934_channel_t chann
 base_status_t pac1934_current_measurement(pac1934_t *me, pac1934_channel_t channel)
 
 /**
- * @brief         PAC1934 init
+ * @brief         PAC1934 measure power
  *
  * @param[in]     me            Pointer to handle of PAC1934 module.
  * @param[in]     channel       Channel number of PAC1934 module.
