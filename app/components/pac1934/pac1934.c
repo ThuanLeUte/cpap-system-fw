@@ -137,7 +137,7 @@ base_status_t pac1934_current_measurement(pac1934_t *me, pac1934_channel_t chann
 
   if(vsense >= 0x8000)  // 0x8000 is the smallest negative number that could be written.
   {
-    vsense           = ((0xFFFF) - (vsense)) + 1;                 // Two's complement
+    vsense           = ((0xFFFF) - (vsense)) + 1;               // Two's complement
     d_vsense         = (double)vsense;
     me->data.current = (fullscalecurrent * d_vsense) / (0xFFFF);
   }

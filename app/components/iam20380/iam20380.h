@@ -26,6 +26,60 @@ extern "C" {
 
 /* Public enumerate/structure ----------------------------------------- */
 /**
+ * @brief IAM20380 fullscale enum
+ */
+typedef enum
+{
+     IAM20380_FULLSCALE_250_DPS  = 0x00
+   , IAM20380_FULLSCALE_500_DPS  = 0x01
+   , IAM20380_FULLSCALE_1000_DPS = 0x02
+   , IAM20380_FULLSCALE_2000_DPS = 0x03
+}
+iam20380_fullscale_t;
+
+/**
+ * @brief IAM20380 digital lowpass filter enum
+ */
+typedef enum
+{
+      IAM20380_DLPF0_NBW307  = 0x00
+    , IAM20380_DLPF1_NBW177  = 0x01
+    , IAM20380_DLPF2_NBW109  = 0x02
+    , IAM20380_DLPF3_NBW59   = 0x03
+    , IAM20380_DLPF4_NBW31   = 0x04
+    , IAM20380_DLPF5_NBW16   = 0x05
+    , IAM20380_DLPF6_NBW8    = 0x06
+    , IAM20380_DLPF7_NBW3451 = 0x07
+}
+iam20380_digi_low_pass_filter_t;
+
+/**
+ * @brief IAM20380 sample rate enum
+ */
+typedef enum
+{
+      IAM20380_SAMPLE_RATE_1000HZ = 0x00
+    , IAM20380_SAMPLE_RATE_500HZ  = 0x01
+    , IAM20380_SAMPLE_RATE_200HZ  = 0x04
+    , IAM20380_SAMPLE_RATE_125HZ  = 0x07
+    , IAM20380_SAMPLE_RATE_100HZ  = 0x09
+    , IAM20380_SAMPLE_RATE_50HZ   = 0x13
+    , IAM20380_SAMPLE_RATE_20HZ   = 0x31
+}
+iam20380_sample_rate_t;
+
+/**
+ * @brief IAM20380 angle data
+ */
+typedef struct
+{
+  iam20380_fullscale_t fullscale;
+  iam20380_digi_low_pass_filter_t digi_low_pass_filter;
+  iam20380_sample_rate_t sample_rate;
+}
+iam20380_config_t;
+
+/**
  * @brief IAM20380 raw data
  */
 typedef struct
@@ -34,51 +88,52 @@ typedef struct
   short y;
   short z;
 }
-iam20380_data_t;
+iam20380_raw_data_t;
 
 /**
- * @brief IAM20380 angle data
+ * @brief IAM20380 angle
  */
 typedef struct
 {
-  float x_angle;
-  float y_angle;
-  float z_angle;
+  float x;
+  float y;
+  float z;
 }
 iam20380_angle_t;
 
 /**
- * @brief IAM20380 sensitivity enum
+ * @brief IAM20380 data
  */
-typedef enum
+typedef struct
 {
-     IAM20380_GYRO_RANGE_250_DPS  = 0X00
-   , IAM20380_GYRO_RANGE_500_DPS  = 0X01
-   , IAM20380_GYRO_RANGE_1000_DPS = 0X02
-   , IAM20380_GYRO_RANGE_2000_DPS = 0X03
+  iam20380_raw_data_t raw_data;
+  iam20380_angle_t angle;
+  float sensitivity;
 }
-iam20380_fullscale_t;
+iam20380_data_t;
 
 /**
  * @brief IAM20380 sensor struct
  */
 typedef struct 
 {
-  uint8_t  device_address;  // I2C device address
+  uint8_t device_address;  // I2C device address
+  iam20380_data_t data;
+  iam20380_config_t config;
 
-  float sensitivity;        // GYRO SENSITIVITY
   // Read n-bytes from device's internal address <reg_addr> via I2C bus
   int (*i2c_read) (uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len);
 
   // Write n-bytes from device's internal address <reg_addr> via I2C bus
   int (*i2c_write) (uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len);
 
-  // delay a time period in milisecond 
-  int (*delay_ms) (uint32_t ms);
+  // Delay a time period in milisecond 
+  void (*delay_ms) (uint32_t ms);
 }
 iam20380_t;
 
 /* Public function prototypes ----------------------------------------- */
+/**
 /**
  * @brief         IAM20380 init
  *
@@ -93,50 +148,33 @@ iam20380_t;
 base_status_t iam20380_init(iam20380_t *me);
 
 /**
- * @brief         IAM20380 reset
- *
- * @param[in]     me      Pointer to handle of IAM20380 module.
- *
- * @attention     None
- *
- * @return
- * - BS_OK
- * - BS_ERROR
- */
-base_status_t iam20380_reset(iam20380_t *me)
-
-/**
  * @brief         IAM20380 read raw data
  *
  * @param[in]     me            Pointer to handle of IAM20380 module.
- * @param[in]     raw_data      IAM20380 raw data
  * @attention     None
  *
  * @return
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t iam20380_get_raw_data(iam20380_t *me, iam20380_data_t *raw_data)
+base_status_t iam20380_get_raw_data(iam20380_t *me)
 
 /**
  * @brief         IAM20380 calculate gyro angle
  *
  * @param[in]     me            Pointer to handle of IAM20380 module.
- * @param[in]     raw_data      IAM20380 raw data
- * @param[in]     angle         gyro angle
  * @attention     None
  *
  * @return
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t iam20380_get_gyro_angle(iam20380_t *me, iam20380_data_t *raw_data, iam20380_angle_t *angle)
+base_status_t iam20380_get_gyro_angle(iam20380_t *me)
 
 /**
  * @brief         IAM20380 get sensitivity
  *
  * @param[in]     me            Pointer to handle of IAM20380 module.
- *
  * @attention     None
  *
  * @return
@@ -144,19 +182,6 @@ base_status_t iam20380_get_gyro_angle(iam20380_t *me, iam20380_data_t *raw_data,
  * - BS_ERROR
  */
 base_status_t iam20380_get_sensitivity(iam20380_t *me)
-
-/**
- * @brief         IAM20380 set fullscale
- *
- * @param[in]     me            Pointer to handle of IAM20380 module.
- * @param[in]     scale         IAM20380 scale
- * @attention     None
- *
- * @return
- * - BS_OK
- * - BS_ERROR
- */
-base_status_t iam20380_set_fullscale(iam20380_t *me, iam20380_fullscale_t scale)
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus

@@ -40,19 +40,6 @@ extern "C" {
 base_status_t bsp_gyro_init(void);
 
 /**
- * @brief         BSP GyroScope reset
- *
- * @param[in]     me      Pointer to handle of GyroScope module.
- *
- * @attention     None
- *
- * @return
- * - BS_OK
- * - BS_ERROR
- */
-base_status_t bsp_gyro_reset(void)
-
-/**
  * @brief         BSP GyroScope read raw data
  *
  * @param[in]     me            Pointer to handle of GyroScope module.
@@ -63,27 +50,24 @@ base_status_t bsp_gyro_reset(void)
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t bsp_gyro_get_raw_data(iam20380_data_t *raw_data)
+base_status_t bsp_gyro_get_raw_data(void)
 
 /**
  * @brief         BSP GyroScope calculate gyro angle
  *
- * @param[in]     me            Pointer to handle of GyroScope module.
- * @param[in]     raw_data      GyroScope raw data
- * @param[in]     angle         GyroScope angle
+ * @param[in]     None
  * @attention     None
  *
  * @return
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t bsp_gyro_get_gyro_angle(iam20380_data_t *raw_data, iam20380_angle_t *angle)
+base_status_t bsp_gyro_get_gyro_angle(void)
 
 /**
  * @brief         BSP GyroScope get sensitivity
  *
- * @param[in]     me            Pointer to handle of GyroScope module.
- *
+ * @param[in]     None
  * @attention     None
  *
  * @return
@@ -91,19 +75,6 @@ base_status_t bsp_gyro_get_gyro_angle(iam20380_data_t *raw_data, iam20380_angle_
  * - BS_ERROR
  */
 base_status_t bsp_gyro_get_sensitivity(void)
-
-/**
- * @brief         BSP GyroScope set fullscale
- *
- * @param[in]     me            Pointer to handle of GyroScope module.
- * @param[in]     scale         GyroScope scale
- * @attention     None
- *
- * @return
- * - BS_OK
- * - BS_ERROR
- */
-base_status_t bsp_gyro_set_fullscale(iam20380_fullscale_t scale)
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus

@@ -14,8 +14,7 @@
 #include "iam20380.h"
 
 /* Private defines ---------------------------------------------------- */
-
-// DEFINES IAM20380 REGISTERS
+// IAM20380 registers
 #define IAM20380_REG_SELF_TEST_X_GYRO            (0X00)
 #define IAM20380_REG_SELF_TEST_Y_GYRO            (0X01)
 #define IAM20380_REG_SELF_TEST_Z_GYRO            (0X02)
@@ -51,7 +50,7 @@
 #define IAM20380_REG_FIFO_R_W                    (0X74)
 #define IAM20380_REG_WHO_AM_I                    (0X75)
 
-// DEFINES IAM20380 IDENTIFIER VALUE
+// IAM20380 identifier value
 #define IAM20380_VALUE_IDENTIFIER                (0xB5)
 
 /* Private enumerate/structure ---------------------------------------- */
@@ -61,6 +60,7 @@
 /* Private function prototypes ---------------------------------------- */
 static base_status_t m_iam20380_read_reg(iam20380_t *me, uint8_t reg, uint8_t *p_data, uint32_t len);
 static base_status_t m_iam20380_write_reg(iam20380_t *me, uint8_t reg, uint8_t *p_data, uint32_t len);
+static base_status_t m_iam20380_write_one_byte(iam20380_t *me, uint8_t reg, uint8_t data);
 
 /* Function definitions ----------------------------------------------- */
 base_status_t iam20380_init(iam20380_t *me)
@@ -68,84 +68,65 @@ base_status_t iam20380_init(iam20380_t *me)
   uint8_t identifier;
   uint8_t tmp;
 
-  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL))
-    return BS_ERROR;
+  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL || (me->delay_ms == NULL))
+    return BS_ERROR_PARAMS;
 
-  // CHECK IDENTITY
-  CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_WHO_AM_I, &identifier, 1));
-  CHECK(IAM20380_VALUE_IDENTIFIER == identifier, BS_ERROR);
+  CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_WHO_AM_I, &identifier, 1)); // IAM20380 check identity
+  CHECK(IAM20380_VALUE_IDENTIFIER == identifier, BS_ERROR); 
 
-  // FULL RESET CHIP
-  tmp = 0x80;
-  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1));
-  me->delay_ms(50);
-
-  // ENABLE TEMP SENSOR - SET CLOCK TO INTERNAL PLL
-  tmp = 0x01;
-  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1));
-  me->delay_ms(50);
-
-  // ENABLE GYRO X-Y-Z
-  tmp = 0x00;
-  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_2, &tmp, 1));
-  me->delay_ms(50);
-
-  // SET SAMPLE RATE AT 1000 HZ AND APLLY A SOFTWARE FILTER
-  tmp = 0x00;
-  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_SMPLRT_DIV, &tmp, 1));
-  me->delay_ms(50);
-
-  // SET DLPF 20HZ AT SAMPLE RATE 1000 HZ
-  tmp = 0x04;
-  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_CONFIG, &tmp, 1));
-  me->delay_ms(50);
-
-  // SET FULLSCALE = 2000 DPS
-  tmp = 0x18;
-  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
-  me->delay_ms(50);
-
-  // ENABLE INTERRUPT WHEN DATA IS READY
-  tmp = 0x01;
-  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_INT_ENABLE, &tmp, 1));
-  me->delay_ms(50);
-
+  CHECK_STATUS(iam20380_config(me)); // IAM20380 config
   return BS_OK;
 }
 
-base_status_t iam20380_reset(iam20380_t *me)
+base_status_t iam20380_config(iam20380_t *me)
 {
   uint8_t tmp;
-
-  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL))
-    return BS_ERROR;
-
-  tmp = 0x80;
   
-  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1));
+  tmp = 0x80;
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1)); // reset chip, disable sleep mode, disable low power mode
+  me->delay_ms(50);
+
+  tmp = 0x01;
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1)); // enable temp sensor - set clock to internal PLL
+  me->delay_ms(50);
+  
+  tmp = 0x00;
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_2, &tmp, 1)); // enable x - y - z axis
+  me->delay_ms(50);
+
+  tmp = me->config.sample_rate;
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_SMPLRT_DIV, &tmp, 1)); // set sample rate 
+  me->delay_ms(50);
+
+  tmp = me->config.digi_low_pass_filter;
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_CONFIG, &tmp, 1)); // set digital low pass filter
+  me->delay_ms(50);
+
+  tmp = (me->config.fullscale << 3) & 0x18;
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1)); // set fulscale 
+  me->delay_ms(50);
+
+  tmp = 0x01;
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_INT_ENABLE, &tmp, 1));  // enable interrupt when data is ready
+  me->delay_ms(50);
 
   return BS_OK;
 }
 
-base_status_t iam20380_get_raw_data(iam20380_t *me, iam20380_data_t *raw_data)
-{
+base_status_t iam20380_get_raw_data(iam20380_t *me)
+{ 
   uint8_t data[6];
   uint8_t status;
 
-  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL))
-    return BS_ERROR;
-
   CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_INT_STATUS, &status, 1));
 
-  status &= 0x01;
-
-  if (status)
+  if (status & 0x01)
   {
-    CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_GYRO_XOUT_H, &data, sizeof(data)));
+    CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_GYRO_XOUT_H, data, sizeof(data)));
 
-    raw_data->x = ((data[0] << 8) | data[1]);
-    raw_data->y = ((data[2] << 8) | data[3]);
-    raw_data->z = ((data[4] << 8) | data[5]);
+    me->data.raw_data.x = ((data[0] << 8) | data[1]);
+    me->data.raw_data.y = ((data[2] << 8) | data[3]);
+    me->data.raw_data.z = ((data[4] << 8) | data[5]);
   }
   else
   {
@@ -155,95 +136,27 @@ base_status_t iam20380_get_raw_data(iam20380_t *me, iam20380_data_t *raw_data)
   return BS_OK;
 }
 
-base_status_t iam20380_get_gyro_angle(iam20380_t *me, iam20380_data_t *raw_data, iam20380_angle_t *angle)
+base_status_t iam20380_get_gyro_angle(iam20380_t *me)
 {
-  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL))
-    return BS_ERROR;
-
   CHECK_STATUS(iam20380_get_sensitivity(me));
-  CHECK_STATUS(iam20380_get_raw_data(me, raw_data));
+  CHECK_STATUS(iam20380_get_raw_data(me);
 
-  angle->x_angle = (float)(raw_data->x) / me->sensitivity;
-  angle->y_angle = (float)(raw_data->y) / me->sensitivity;
-  angle->z_angle = (float)(raw_data->z) / me->sensitivity;
+  me->data.angle.x = (float)(me->data.raw_data.x) / me->data.sensitivity;
+  me->data.angle.y = (float)(me->data.raw_data.y) / me->data.sensitivity;
+  me->data.angle.z = (float)(me->data.raw_data.z) / me->data.sensitivity;
 
   return BS_OK;
 }
 
 base_status_t iam20380_get_sensitivity(iam20380_t *me)
 {
-  uint8_t data;
-
-  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL))
-    return BS_ERROR;
-
-  CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_GYRO_CONFIG, &data, 1);
-
-  data &= (0x03 << 3);
-  data >>= 3;
-
-  switch (data)
+  switch (me->config.fullscale)
   {
-    case 0x00:
-      me->sensitivity = 131.0;
-      break;
-
-    case 0x01:
-      me->sensitivity = 65.5;
-      break;
-
-    case 0x02:
-      me->sensitivity = 32.8;  
-      break;
-
-    case 0x03:
-      me->sensitivity = 16.4;
-      break;
-
-    default:
-      break;
-  }
-
-  return BS_OK;
-}
-
-base_status_t iam20380_set_fullscale(iam20380_t *me, iam20380_fullscale_t scale)
-{
-  uint8_t tmp;
-
-  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL))
-    return BS_ERROR;
-
-  switch (scale)
-  {
-    case IAM20380_GYRO_RANGE_250_DPS:
-      CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
-      tmp &= ~((0x03) << 3);
-      CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
-      break;
-
-    case IAM20380_GYRO_RANGE_500_DPS:
-      CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
-      tmp &= ~((0x03) << 3);
-      tmp |= (0x01 << 3);
-      CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
-      break;
-
-    case IAM20380_GYRO_RANGE_1000_DPS:
-      CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
-      tmp &= ~((0x03) << 3);
-      tmp |= (0x02 << 3);
-      CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
-      break;
-
-    case IAM20380_GYRO_RANGE_2000_DPS:
-      CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
-      tmp |= (0x03 << 3);
-      CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
-      break;
-
-    default:
-      break;
+    case IAM20380_FULLSCALE_250_DPS : me->data.sensitivity = 131.0; break;
+    case IAM20380_FULLSCALE_500_DPS : me->data.sensitivity = 65.5;  break;
+    case IAM20380_FULLSCALE_1000_DPS: me->data.sensitivity = 32.8;  break;
+    case IAM20380_FULLSCALE_2000_DPS: me->data.sensitivity = 16.4;  break;
+    default : break;
   }
 
   return BS_OK;
@@ -272,7 +185,7 @@ static base_status_t m_iam20380_read_reg(iam20380_t *me, uint8_t reg, uint8_t *p
 }
 
 /**
- * @brief         IAM20380 read register
+ * @brief         IAM20380 write register
  *
  * @param[in]     me      Pointer to handle of IAM20380 module.
  * @param[in]     reg     Register
@@ -288,6 +201,26 @@ static base_status_t m_iam20380_read_reg(iam20380_t *me, uint8_t reg, uint8_t *p
 static base_status_t m_iam20380_write_reg(iam20380_t *me, uint8_t reg, uint8_t *p_data, uint32_t len)
 {
   CHECK(0 == me->i2c_write(me->device_address, reg, p_data, len), BS_ERROR);
+
+  return BS_OK;
+}
+
+/**
+ * @brief         IAM20380 write one byte
+ *
+ * @param[in]     me      Pointer to handle of IAM20380 module.
+ * @param[in]     reg     Register
+ * @param[in]     data    Data
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+static base_status_t m_iam20380_write_one_byte(iam20380_t *me, uint8_t reg, uint8_t data)
+{
+  CHECK(0 == me->i2c_write(me->device_address, reg, data, 1), BS_ERROR);
 
   return BS_OK;
 }

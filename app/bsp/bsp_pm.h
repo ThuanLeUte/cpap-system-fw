@@ -42,7 +42,7 @@ base_status_t bsp_pm_init(void);
 /**
  * @brief         BSP Multi Channel Power Monitor get voltage
  *
- * @param[in]     voltage  Multi Channel Power Monitor Voltage
+ * @param[in]     channel   Multi Channel Power Monitor Channel
  *
  * @attention     None
  *
@@ -50,12 +50,12 @@ base_status_t bsp_pm_init(void);
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t bsp_pm_voltage_measurement(pac1934_data_t *voltage, uint8_t channel);
+base_status_t bsp_pm_voltage_measurement(pac1934_channel_t channel);
 
 /**
  * @brief         BSP Multi Channel Power Monitor get current
  *
- * @param[in]     current   Multi Channel Power Monitor Current
+ * @param[in]     channel   Multi Channel Power Monitor Channel
  *
  * @attention     None
  *
@@ -63,12 +63,12 @@ base_status_t bsp_pm_voltage_measurement(pac1934_data_t *voltage, uint8_t channe
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t bsp_pm_current_measurement(pac1934_data_t *current, uint8_t channel);
+base_status_t bsp_pm_current_measurement(pac1934_channel_t channel);
 
 /**
  * @brief         BSP Multi Channel Power Monitor get power
  *
- * @param[in]     power  Multi Channel Power Monitor Power
+ * @param[in]     channel   Multi Channel Power Monitor Channel
  *
  * @attention     None
  *
@@ -76,7 +76,7 @@ base_status_t bsp_pm_current_measurement(pac1934_data_t *current, uint8_t channe
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t bsp_pm_power_measurement(pac1934_data_t *power, uint8_t channel);
+base_status_t bsp_pm_power_measurement(pac1934_channel_t channel);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
