@@ -29,8 +29,8 @@ extern "C" {
 /**
  * @brief         BSP GyroScope init
  *
- * @param[in]     me      Pointer to handle of GyroScope module.
- *
+ * @param[in]     None
+
  * @attention     None
  *
  * @return
@@ -42,8 +42,8 @@ base_status_t bsp_gyro_init(void);
 /**
  * @brief         BSP GyroScope read raw data
  *
- * @param[in]     me            Pointer to handle of GyroScope module.
- * @param[in]     raw_data      GyroScope raw data
+ * @param[in]     None
+ *
  * @attention     None
  *
  * @return
@@ -56,6 +56,7 @@ base_status_t bsp_gyro_get_raw_data(void)
  * @brief         BSP GyroScope calculate gyro angle
  *
  * @param[in]     None
+ *
  * @attention     None
  *
  * @return
@@ -68,6 +69,7 @@ base_status_t bsp_gyro_get_gyro_angle(void)
  * @brief         BSP GyroScope get sensitivity
  *
  * @param[in]     None
+ *
  * @attention     None
  *
  * @return
