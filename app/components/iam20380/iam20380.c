@@ -66,7 +66,6 @@ static base_status_t m_iam20380_write_one_byte(iam20380_t *me, uint8_t reg, uint
 base_status_t iam20380_init(iam20380_t *me)
 {
   uint8_t identifier;
-  uint8_t tmp;
 
   if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL || (me->delay_ms == NULL))
     return BS_ERROR_PARAMS;
