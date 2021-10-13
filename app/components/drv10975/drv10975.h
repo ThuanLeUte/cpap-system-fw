@@ -26,25 +26,27 @@ extern "C" {
 
 /* Public enumerate/structure ----------------------------------------- */
 /**
- * @brief DRV10975 data
+ * @brief DRV10975 motor value
  */
 typedef struct
 {
-  float motor_frequency;
-  float motor_period;
-  float motor_current;
-  float motor_supply_voltage;
+  uint16_t speed;    
+  float frequency;
+  float period;
+  float current;
+  float supply_voltage;
+  float velocity;
 }
-drv10975_data_t;
+drv10975_motor_value_t;
 
 /**
  * @brief DRV10975 struct
  */
 typedef struct 
 {
-  uint8_t  device_address;  // I2C device address
+  uint8_t device_address;  // I2C device address
 
-  uint16_t motor_speed;
+  drv10975_motor_value_t value; // Motor value
 
   // Read n-bytes from device's internal address <reg_addr> via I2C bus
   int (*i2c_read) (uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len);
@@ -52,8 +54,12 @@ typedef struct
   // Write n-bytes from device's internal address <reg_addr> via I2C bus
   int (*i2c_write) (uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len);
 
-  // delay a time period in milisecond 
-  int (*delay_ms) (uint32_t ms);
+  // Delay a time period in milisecond 
+  void (*delay_ms) (uint32_t ms);
+
+  // Gpio set
+  void (*gpio_write) (uint8_t pin, uint8_t state);
+
 }
 drv10975_t;
 
