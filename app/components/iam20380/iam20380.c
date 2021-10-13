@@ -83,31 +83,31 @@ base_status_t iam20380_config(iam20380_t *me)
   uint8_t tmp;
   
   tmp = 0x80;
-  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1)); // reset chip, disable sleep mode, disable low power mode
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1)); // Reset chip, disable sleep mode, disable low power mode
   me->delay_ms(50);
 
   tmp = 0x01;
-  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1)); // enable temp sensor - set clock to internal PLL
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1)); // Enable temp sensor - set clock to internal PLL
   me->delay_ms(50);
   
   tmp = 0x00;
-  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_2, &tmp, 1)); // enable x - y - z axis
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_2, &tmp, 1)); // Enable x - y - z axis
   me->delay_ms(50);
 
   tmp = me->config.sample_rate;
-  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_SMPLRT_DIV, &tmp, 1)); // set sample rate 
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_SMPLRT_DIV, &tmp, 1)); // Set sample rate 
   me->delay_ms(50);
 
   tmp = me->config.digi_low_pass_filter;
-  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_CONFIG, &tmp, 1)); // set digital low pass filter
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_CONFIG, &tmp, 1)); // Set digital low pass filter
   me->delay_ms(50);
 
   tmp = (me->config.fullscale << 3) & 0x18;
-  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1)); // set fulscale 
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1)); // Set fulscale 
   me->delay_ms(50);
 
   tmp = 0x01;
-  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_INT_ENABLE, &tmp, 1));  // enable interrupt when data is ready
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_INT_ENABLE, &tmp, 1));  // Enable interrupt when data is ready
   me->delay_ms(50);
 
   return BS_OK;
