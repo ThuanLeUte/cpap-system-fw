@@ -78,6 +78,32 @@ base_status_t bsp_pm_current_measurement(pac1934_channel_t channel);
  */
 base_status_t bsp_pm_power_measurement(pac1934_channel_t channel);
 
+/**
+ * @brief         BSP Multi Channel Power Monitor into sleep mode
+ *
+ * @param[in]     None
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_pm_into_sleep_mode(void);
+
+/**
+ * @brief         BSP Multi Channel Power Monitor into normal mode
+ *
+ * @param[in]     None
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_pm_into_normal_mode(void);
+
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
 } // extern "C"

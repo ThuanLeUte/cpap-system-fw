@@ -26,16 +26,16 @@ extern "C" {
 
 /* Public enumerate/structure ----------------------------------------- */
 /**
- * @brief PAC1934 data
+ * @brief PAC1934 sample rate
  */
-typedef struct
+typedef enum
 {
-  double volt;
-  double current;
-  double power;
-  double energy;
+    PAC1934_SAMPLE_RATE_1000HZ = 0
+  , PAC1934_SAMPLE_RATE_256HZ  
+  , PAC1934_SAMPLE_RATE_64HZ   
+  , PAC1934_SAMPLE_RATE_8HZ    
 }
-pac1934_data_t;
+pac1934_sample_rate_t;
 
 /**
  * @brief PAC1934 channels enum
@@ -50,6 +50,28 @@ typedef enum
 pac1934_channel_t;
 
 /**
+ * @brief PAC1934 data
+ */
+typedef struct
+{
+  double volt;
+  double current;
+  double power;
+  double energy;
+}
+pac1934_data_t;
+
+/**
+ * @brief PAC1934 config
+ */
+typedef struct
+{
+  pac1934_sample_rate_t sample_rate;
+  bool sleep_mode_bit;
+}
+pac1934_config_t;
+
+/**
  * @brief PAC1934 sensor struct
  */
 typedef struct 
@@ -57,6 +79,7 @@ typedef struct
   uint8_t device_address;  // I2C device address
 
   pac1934_data_t data;     // PAC1934 data
+  pac1934_config_t config; // PAC1934 config
 
   // Read n-bytes from device's internal address <reg_addr> via I2C bus
   int (*i2c_read) (uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len);
@@ -84,11 +107,24 @@ pac1934_t;
 base_status_t pac1934_init(pac1934_t *me);
 
 /**
+ * @brief         PAC1934 config
+ *
+ * @param[in]     me      Pointer to handle of PAC1934 module.
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t pac1934_config(pac1934_t *me);
+
+/**
  * @brief         PAC1934 measure voltage
  *
  * @param[in]     me            Pointer to handle of PAC1934 module.
  * @param[in]     channel       Channel number of PAC1934 module.
- * 
+ *
  * @attention     None
  *
  * @return
@@ -124,6 +160,32 @@ base_status_t pac1934_current_measurement(pac1934_t *me, pac1934_channel_t chann
  * - BS_ERROR
  */
 base_status_t pac1934_power_measurement(pac1934_t *me, pac1934_channel_t channel)
+
+/**
+ * @brief         PAC1934 into sleep mode
+ *
+ * @param[in]     me      Pointer to handle of PAC1934 module.
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t pac1934_into_sleep_mode(pac1934_t *me);
+
+/**
+ * @brief         PAC1934 active to normal mode
+ *
+ * @param[in]     me      Pointer to handle of PAC1934 module.
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t pac1934_into_normal_mode(pac1934_t *me);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus

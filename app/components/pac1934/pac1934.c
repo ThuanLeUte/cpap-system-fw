@@ -15,49 +15,59 @@
 
 /* Private defines ---------------------------------------------------- */
 // PAC1934 resgisters
-#define PAC1934_REG_REFRESH          (0x00)
-#define PAC1934_REG_PAC_CTRL         (0x01)
-#define PAC1934_REG_ACC_COUNT        (0x02)
-#define PAC1934_REG_VPOWER1_ACC      (0x03)
-#define PAC1934_REG_VPOWER2_ACC      (0x04)
-#define PAC1934_REG_VPOWER3_ACC      (0x05)
-#define PAC1934_REG_VPOWER4_ACC      (0x06)
-#define PAC1934_REG_VBUS1            (0x07)
-#define PAC1934_REG_VBUS2            (0x08)
-#define PAC1934_REG_VBUS3            (0x09)
-#define PAC1934_REG_VBUS4            (0x0A)
-#define PAC1934_REG_VSENSE1          (0x0B)
-#define PAC1934_REG_VSENSE2          (0x0C)
-#define PAC1934_REG_VSENSE3          (0x0D)
-#define PAC1934_REG_VSENSE4          (0x0E)
-#define PAC1934_REG_VBUS1_AVG        (0x0F)
-#define PAC1934_REG_VBUS2_AVG        (0x10)
-#define PAC1934_REG_VBUS3_AVG        (0x11)
-#define PAC1934_REG_VBUS4_AVG        (0x12)
-#define PAC1934_REG_VSENSE1_AVG      (0x13)
-#define PAC1934_REG_VSENSE2_AVG      (0x14)
-#define PAC1934_REG_VSENSE3_AVG      (0x15)
-#define PAC1934_REG_VSENSE4_AVG      (0x16)
-#define PAC1934_REG_VPOWER1          (0x17)
-#define PAC1934_REG_VPOWER2          (0x18)
-#define PAC1934_REG_VPOWER3          (0x19)
-#define PAC1934_REG_VPOWER4          (0x1A)
-#define PAC1934_REG_CHANNEL_DIS      (0x1C)
-#define PAC1934_REG_NEG_PWR          (0x1D)
-#define PAC1934_REG_REFRESH_G        (0X1E)
-#define PAC1934_REG_REFRESH_V        (0X1F)
-#define PAC1934_REG_SLOW             (0X20)
-#define PAC1934_REG_CTRL_ACT         (0X21)
-#define PAC1934_REG_CHANNEL_DIS_ACT  (0X22)
-#define PAC1934_REG_NEG_PWR_ACT      (0X23)
-#define PAC1934_REG_CTRL_LAT         (0X24)
-#define PAC1934_REG_CHANNEL_DIS_LAT  (0X25)
-#define PAC1934_REG_NEG_PWR_LAT      (0X26)
-#define PAC1934_REG_PID              (0XFD)
-#define PAC1934_REG_MID              (0XFE)
-#define PAC1934_REG_REV              (0XFF)
+#define PAC1934_REG_REFRESH               (0x00)
+#define PAC1934_REG_PAC_CTRL              (0x01)
+#define PAC1934_REG_ACC_COUNT             (0x02)
+#define PAC1934_REG_VPOWER1_ACC           (0x03)
+#define PAC1934_REG_VPOWER2_ACC           (0x04)
+#define PAC1934_REG_VPOWER3_ACC           (0x05)
+#define PAC1934_REG_VPOWER4_ACC           (0x06)
+#define PAC1934_REG_VBUS1                 (0x07)
+#define PAC1934_REG_VBUS2                 (0x08)
+#define PAC1934_REG_VBUS3                 (0x09)
+#define PAC1934_REG_VBUS4                 (0x0A)
+#define PAC1934_REG_VSENSE1               (0x0B)
+#define PAC1934_REG_VSENSE2               (0x0C)
+#define PAC1934_REG_VSENSE3               (0x0D)
+#define PAC1934_REG_VSENSE4               (0x0E)
+#define PAC1934_REG_VBUS1_AVG             (0x0F)
+#define PAC1934_REG_VBUS2_AVG             (0x10)
+#define PAC1934_REG_VBUS3_AVG             (0x11)
+#define PAC1934_REG_VBUS4_AVG             (0x12)
+#define PAC1934_REG_VSENSE1_AVG           (0x13)
+#define PAC1934_REG_VSENSE2_AVG           (0x14)
+#define PAC1934_REG_VSENSE3_AVG           (0x15)
+#define PAC1934_REG_VSENSE4_AVG           (0x16)
+#define PAC1934_REG_VPOWER1               (0x17)
+#define PAC1934_REG_VPOWER2               (0x18)
+#define PAC1934_REG_VPOWER3               (0x19)
+#define PAC1934_REG_VPOWER4               (0x1A)
+#define PAC1934_REG_CHANNEL_DIS           (0x1C)
+#define PAC1934_REG_NEG_PWR               (0x1D)
+#define PAC1934_REG_REFRESH_G             (0X1E)
+#define PAC1934_REG_REFRESH_V             (0X1F)
+#define PAC1934_REG_SLOW                  (0X20)
+#define PAC1934_REG_CTRL_ACT              (0X21)
+#define PAC1934_REG_CHANNEL_DIS_ACT       (0X22)
+#define PAC1934_REG_NEG_PWR_ACT           (0X23)
+#define PAC1934_REG_CTRL_LAT              (0X24)
+#define PAC1934_REG_CHANNEL_DIS_LAT       (0X25)
+#define PAC1934_REG_NEG_PWR_LAT           (0X26)
+#define PAC1934_REG_PRODUCT_ID            (0XFD)
+#define PAC1934_REG_MANU_ID               (0XFE)
+#define PAC1934_REG_REV_ID                (0XFF)
 
-#define FULLSCALE_RANGE              (0.1f)
+// PAC1934 product ID
+#define PAC1934_PRODUCT_ID_IDENTIFIER     (0x5B) // Check if this is the correct PAC1934 chip
+
+// PAC1934 manufacturer ID
+#define PAC1934_MANU_ID_IDENTIFIER        (0x5D) // Check if the chip is manufacture from MICROCHIP
+
+// PAC1934 revision ID
+#define PAC1934_REV_ID_IDENTIFIER         (0x03) 
+
+// PAC1934 fullscale range
+#define FULLSCALE_RANGE                   (0.1f)
 
 /* Private enumerate/structure ---------------------------------------- */
 /* Private macros ----------------------------------------------------- */
@@ -67,22 +77,44 @@
 static base_status_t m_pac1934_read_reg(pac1934_t *me, uint8_t reg, uint8_t *p_data, uint32_t len);
 static base_status_t m_pac1934_write_reg(pac1934_t *me, uint8_t reg, uint8_t data);
 static base_status_t m_pac1934_refresh(pac1934_t *me);
+static base_status_t m_pac1934_refresh_v(pac1934_t *me);
 
 /* Function definitions ----------------------------------------------- */
 base_status_t pac1934_init(pac1934_t *me)
 {
+  uint8_t identifier;
+
   if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL) || (me->delay_ms == NULL))
     return BS_ERROR_PARAMS;
 
+  CHECK_STATUS(m_iam20380_read_reg(me, PAC1934_REG_REV_ID, &identifier, 1)); // PAC1934 check revision ID
+  CHECK(PAC1934_REV_ID_IDENTIFIER == identifier, BS_ERROR); 
+
+  CHECK_STATUS(m_iam20380_read_reg(me, PAC1934_REG_MANU_ID, &identifier, 1)); // PAC1934 check manufacturer ID
+  CHECK(PAC1934_MANU_ID_IDENTIFIER == identifier, BS_ERROR); 
+
+  CHECK_STATUS(m_iam20380_read_reg(me, PAC1934_REG_PRODUCT_ID, &identifier, 1)); // PAC1934 check product ID
+  CHECK(PAC1934_PRODUCT_ID_IDENTIFIER == identifier, BS_ERROR); 
+
+  CHECK_STATUS(pac1934_config(me));
+
+  return BS_OK;
+}
+
+base_status_t pac1934_config(pac1934_t *me)
+{
+  uint8_t tmp;
+
   CHECK_STATUS(m_pac1934_refresh(me));
 
-  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_PAC_CTRL, 0x00));
+  tmp = ((me->config.sample_rate << 6) | (me->config.sleep_mode_bit << 5)); // set sample rate and config sleep mode
+  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_PAC_CTRL, tmp)); 
   
   CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_NEG_PWR, 0xFF));
 
   CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_CHANNEL_DIS, 0x00));
 
-  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_SLOW, 0x00));
+  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_SLOW, 0x80));
 
   CHECK_STATUS(m_pac1934_refresh(me));
 
@@ -189,6 +221,30 @@ base_status_t pac1934_power_measurement(pac1934_t *me, pac1934_channel_t channel
   return BS_OK;
 }
 
+base_status_t pac1934_into_sleep_mode(pac1934_t *me)
+{
+  uint8_t tmp;
+
+  CHECK_STATUS(m_pac1934_read_reg(me, PAC1934_REG_PAC_CTRL, &tmp, 1));
+  tmp |= 0x20; 
+  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_PAC_CTRL, tmp)); 
+  CHECK_STATUS(m_pac1934_refresh_v(me));
+
+  return BS_OK;
+}
+
+base_status_t pac1934_into_normal_mode(pac1934_t *me)
+{
+  uint8_t tmp;
+
+  CHECK_STATUS(m_pac1934_read_reg(me, PAC1934_REG_PAC_CTRL, &tmp, 1));
+  tmp &= 0xDF; 
+  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_PAC_CTRL, tmp)); 
+  CHECK_STATUS(m_pac1934_refresh_v(me));
+
+  return BS_OK;
+}
+
 /* Private function definitions ---------------------------------------- */
 /**
  * @brief         PAC1934 read register
@@ -245,6 +301,25 @@ static base_status_t m_pac1934_write_reg(pac1934_t *me, uint8_t reg, uint8_t dat
 static base_status_t m_pac1934_refresh(pac1934_t *me)
 {
   CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_REFRESH, 0x00);
+  me->delay_ms(100);
+
+  return BS_OK;
+}
+
+/**
+ * @brief         PAC1934 refesh V
+ *
+ * @param[in]     me      Pointer to handle of PAC1934 module.
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+static base_status_t m_pac1934_refresh_v(pac1934_t *me)
+{
+  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_REFRESH_V, 0x00);
   me->delay_ms(100);
 
   return BS_OK;
