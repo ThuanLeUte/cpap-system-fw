@@ -1,101 +1,191 @@
 /**
- * @file       bsp.h
+ * @file       bsp_brc.h
  * @copyright  Copyright (C) 2020 Hydratech. All rights reserved.
  * @license    This project is released under the Hydratech License.
  * @version    1.0.0
- * @date       2021-01-23
- * @author     Thuan Le
- * @brief      Board Support Package (BSP)
+ * @date       2021-10-14
+ * @author     Hiep Le
+ * @brief      Board support package for Brushless Motor Driver (DRV10975)
  * @note       None
  * @example    None
  */
 
 /* Define to prevent recursive inclusion ------------------------------ */
-#ifndef __BSP_H
-#define __BSP_H
+#ifndef __BSP_BRC_H
+#define __BSP_BRC_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ----------------------------------------------------------- */
-#include "platform_common.h"
-#include "bsp_io_10.h"
+#include "drv10975.h"
 
 /* Public defines ----------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------- */
-/**
- * @brief Base status structure
- */
-typedef enum
-{
-  BS_OK = 0x00,
-  BS_ERROR_PARAMS,
-  BS_ERROR
-}
-base_status_t;
-
-/**
- * @brief Bool structure
- */
-typedef enum
-{
-  BS_FALSE = 0x00,
-  BS_TRUE  = 0x01
-}
-bool_t;
-
 /* Public macros ------------------------------------------------------ */
-#define CHECK(expr, ret)            \
-  do {                              \
-    if (!(expr)) {                  \
-      ESP_LOGE(TAG, "%s", #expr);   \
-      return (ret);                 \
-    }                               \
-  } while (0)
-
-#define CHECK_STATUS(expr)          \
-  do {                              \
-    base_status_t ret = (expr);     \
-    if (BS_OK != ret) {             \
-      ESP_LOGE(TAG, "%s", #expr);   \
-      return (ret);                 \
-    }                               \
-  } while (0)
-
 /* Public variables --------------------------------------------------- */
 /* Public function prototypes ----------------------------------------- */
 /**
- * @brief         Board support package init
+ * @brief         BSP brushless motor driver init
  *
  * @param[in]     None
  *
  * @attention     None
  *
- * @return        None
+ * @return
+ * - BS_OK
+ * - BS_ERROR
  */
-void bsp_hw_init(void);
+base_status_t bsp_brc_init(void);
 
 /**
- * @brief         I2C read
+ * @brief         BSP brushless motor driver set reverse direction for motor
  *
- * @param[in]     slave_addr    Slave address
- * @param[in]     reg_addr      Register address
- * @param[in]     p_data        Pointer to handle of data
- * @param[in]     len           Data length
+ * @param[in]     None
  *
  * @attention     None
  *
  * @return
- * - 0      Succes
- * - 1      Error
+ * - BS_OK
+ * - BS_ERROR
  */
-int bsp_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint8_t *p_data, uint32_t len);
+base_status_t bsp_brc_forward_direction(void);
+
+/**
+ * @brief         BSP brushless motor driver set reverse direction for motor
+ *
+ * @param[in]     None
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_brc_reverse_direction(void);
+
+/**
+ * @brief         BSP brushless motor driver set motor speed
+ *
+ * @param[in]     None
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_brc_set_motor_speed(uint16_t percent_speed);
+
+/**
+ * @brief         BSP brushless motor driver get motor velocity
+ *
+ * @param[in]     None
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_brc_get_motor_velocity(void);
+
+/**
+ * @brief         BSP brushless motor driver get motor period
+ *
+ * @param[in]     None
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_brc_get_motor_period(void);
+
+/**
+ * @brief         BSP brushless motor driver get device supply voltage
+ *
+ * @param[in]     None
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_brc_get_motor_supply_voltage(void);
+
+/**
+ * @brief         BSP brushless motor driver get motor current
+ *
+ * @param[in]     None
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_brc_get_motor_current(void);
+
+/**
+ * @brief         BSP brushless motor driver check device over temp
+ *
+ * @param[in]     None
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_brc_check_over_temp(void);
+
+/**
+ * @brief         BSP brushless motor driver check device in sleep mode
+ *
+ * @param[in]     None
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_brc_check_sleep_mode(void);
+
+/**
+ * @brief         BSP brushless motor driver check device over current
+ *
+ * @param[in]     None
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_brc_check_over_current(void);
+
+/**
+ * @brief         BSP brushless motor driver check motor lock
+ *
+ * @param[in]     None
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t bsp_brc_check_motor_lock(void);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
 } // extern "C"
 #endif
-#endif // __BSP_H
+#endif // __BSP_BRC_H
 
 /* End of file -------------------------------------------------------- */

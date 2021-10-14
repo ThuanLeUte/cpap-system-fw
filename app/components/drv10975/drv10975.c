@@ -46,9 +46,6 @@
 #define DRV10975_REG_SYS_OPT8                      (0X2A)
 #define DRV10975_REG_SYS_OPT9                      (0X2B)
 
-// DRV10975 max speed
-#define DRV10975_MAX_SPEED                         (0x1FF)
-
 // DRV10975 direction 
 #define DRV10975_FORWARD_DIRECTION                 (0)
 #define DRV10975_REVERSE_DIRECTION                 (1)
@@ -68,19 +65,8 @@ static uint16_t m_drv10975_modifed_map(uint16_t x, uint16_t in_min, uint16_t in_
 /* Function definitions ----------------------------------------------- */
 base_status_t drv10975_init(drv10975_t *me)
 {
-  uint8_t tmp;
-
   if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL) || (me->delay_ms == NULL))
     return BS_ERROR;
-
-  
-
-  return BS_OK;
-}
-
-base_status_t drv10975_config(drv10975_t *me)
-{
-  uint8_t tmp;
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_EE_CTRL, 0X40)); // Enable the writing to configuration register
 
@@ -112,6 +98,8 @@ base_status_t drv10975_config(drv10975_t *me)
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_EE_CTRL, 0x50)); //  Enable program the EEPROM                     
 
+  CHECK_STATUS(drv10975_set_motor_speed(me, 0)); // Set motor speed = 0 
+
   return BS_OK;
 }
 
@@ -129,9 +117,11 @@ base_status_t drv10975_reverse_direction(drv10975_t *me)
   return BS_OK;
 }
 
-base_status_t drv10975_set_speed(drv10975_t *me, uint16_t percent_speed)
+base_status_t drv10975_set_motor_speed(drv10975_t *me, uint16_t percent_speed)
 {
   uint8_t tmp;
+
+  if(percent_speed > 100) percent_speed = 100;
 
   me->value.speed = m_drv10975_modifed_map(percent_speed, 0, 100, 0, DRV10975_MOTOR_MAX_SPEED);
 
@@ -145,120 +135,103 @@ base_status_t drv10975_set_speed(drv10975_t *me, uint16_t percent_speed)
   return BS_OK;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-base_status_t drv10975_enable_i2c_control_mode(drv10975_t *me)
-{
-  uint8_t tmp;
-
-  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_SPEEDCTRL2, &tmp, 1));
-  tmp |= 0x80;
-  CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_SPEEDCTRL2, &tmp, 1));
-
-  return BS_OK;
-}
-
-
-
-base_status_t drv10975_get_motor_frequency(drv10975_t *me, drv10975_data_t data)
+base_status_t drv10975_get_motor_velocity(drv10975_t *me)
 {
   uint8_t tmp[2];
 
-  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_MOTORSPEED1, &tmp, sizeof(tmp)));
+  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_MOTOR_SPEED1, &tmp, sizeof(tmp)));
 
-  data->motor_frequency = (tmp[0] << 8 | tmp[1]) / 10;
+  me->value.velocity = (float)((tmp[0] << 8 | tmp[1]) / 10.0);
   
   return BS_OK;
 }
 
-base_status_t drv10975_get_motor_period(drv10975_t *me, drv10975_data_t data)
+base_status_t drv10975_get_motor_period(drv10975_t *me)
 {
   uint8_t tmp[2];
 
-  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_MOTORPERIOD1, &tmp, sizeof(tmp)));
+  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_MOTOR_PERIOD1, &tmp, sizeof(tmp)));
 
-  data->motor_period = (tmp[0] << 8 | tmp[1]) * 10;
+  me->value.period = (float)((tmp[0] << 8 | tmp[1]) * 10);
 
   return BS_OK;
 }
 
-base_status_t drv10975_get_motor_current(drv10975_t *me, drv10975_data_t data)
-{
-  uint8_t tmp[2];
-
-  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_MOTORCURRENT1, &tmp, sizeof(tmp)));
-
-  data->motor_current = (((tmp[0] << 8) & 0x07) | tmp[1]);
-
-  if(data->motor_current >= 1023)
-  {
-    data->motor_current = 3 * ((data->motor_current - 1023) / 512);
-  }
-  else
-  {
-    data->motor_current = 3 * ((data->motor_current) / 512);
-  }
-
-  return BS_OK;
-}
-
-base_status_t drv10975_get_supply_voltage(drv10975_t *me, drv10975_data_t data)
+base_status_t drv10975_get_motor_supply_voltage(drv10975_t *me)
 {
   uint8_t tmp;
 
-  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_SUPPLYVOLTAGE, &tmp, 1);
+  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_SUPPLY_VOLTAGE, &tmp, 1);
 
-  data->motor_supply_voltage = tmp * 22.8 / 256;
+  me->value.supply_voltage = (float)(tmp * 22.8 / 256.0);
 
   return BS_OK;
 }
 
+base_status_t drv10975_get_motor_current(drv10975_t *me)
+{
+  uint8_t tmp[2];
+  uint16_t current;
 
+  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_MOTOR_CURRENT1, &tmp, sizeof(tmp)));
 
+  current = (((tmp[0] & 0x07) << 8) | tmp[1]);
 
+  if(current >= 0x3FF)
+  {
+    me->value.current = (float)((current - 0x3FF) * 170.67);
+  }
+  else
+  {
+    me->value.current = (float)(current * 170.67);
+  }
 
+  return BS_OK;
+}
 
+base_status_t drv10975_check_over_temp(drv10975_t *me)
+{
+  uint8_t tmp;
 
+  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_STATUS, &tmp, 1);
 
+  me->status = tmp & 0x80;
 
+  return BS_OK;
+}
 
+base_status_t drv10975_check_sleep_mode(drv10975_t *me)
+{
+  uint8_t tmp;
 
+  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_STATUS, &tmp, 1);
 
+  me->status = tmp & 0x40;
 
+  return BS_OK;
+}
 
+base_status_t drv10975_check_over_current(drv10975_t *me)
+{
+  uint8_t tmp;
 
+  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_STATUS, &tmp, 1);
 
+  me->status = tmp & 0x20;
+
+  return BS_OK;
+}
+
+base_status_t drv10975_check_motor_lock(drv10975_t *me)
+{
+  uint8_t tmp;
+
+  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_STATUS, &tmp, 1);
+
+  me->status = tmp & 0x10;
+
+  return BS_OK;
+}
 
 /* Private function definitions ---------------------------------------- */
 /**

@@ -1,81 +1,116 @@
 /**
-* @file       bsp.c
-* @copyright  Copyright (C) 2021 ThuanLe. All rights reserved.
-* @license    This project is released under the ThuanLe License.
-* @version    01.00.00
-* @date       2021-03-13
-* @author     ThuanLe
-* @brief      BSP (Board Support Package)
-* @note       None
-* @example    None
-*/
+ * @file       bsp_brc.c
+ * @copyright  Copyright (C) 2020 Hydratech. All rights reserved.
+ * @license    This project is released under the Hydratech License.
+ * @version    1.0.0
+ * @date       2021-10-14
+ * @author     Hiep Le
+ * @brief      Board support package for Brushless Motor (DRV10975)
+ * @note       None
+ * @example    None
+ */
 
-/* Includes ----------------------------------------------------------------- */
-#include "bsp.h"
+/* Includes ----------------------------------------------------------- */
+#include "bsp_brc.h"
 
-/* Private defines ---------------------------------------------------------- */
-static const char *TAG = "BSP";
+/* Private defines ---------------------------------------------------- */
+/* Private enumerate/structure ---------------------------------------- */
+/* Private macros ----------------------------------------------------- */
+/* Public variables --------------------------------------------------- */
+/* Private variables -------------------------------------------------- */
+static drv10975_t m_drv10975;
 
-/* Public variables --------------------------------------------------------- */
-/* Private variables -------------------------------------------------------- */
-/* Private function prototypes ---------------------------------------------- */
-static inline void m_bsp_nvs_init(void);
-static inline void m_bsp_spiffs_init(void);
-
-/* Function definitions ----------------------------------------------------- */
-void bsp_init(void)
+/* Private function prototypes ---------------------------------------- */
+/* Function definitions ----------------------------------------------- */
+base_status_t bsp_brc_init(void)
 {
-  m_bsp_nvs_init();
-  m_bsp_spiffs_init();
+  m_drv10975.device_address = DRV10975_I2C_ADDR;
+  m_drv10975.i2c_read       = bsp_i2c_read;
+  m_drv10975.i2c_write      = bsp_i2c_write;
+  m_drv10975.delay_ms       = bsp_delay_ms;
+  m_drv10975.gpio_write     = bsp_gpio_write;
+
+  CHECK_STATUS(drv10975_init(&m_drv10975));
+
+  return BS_OK;
 }
 
-
-/* Private function --------------------------------------------------------- */
-
-
-static inline void m_bsp_nvs_init(void)
+base_status_t bsp_brc_forward_direction(void)
 {
-  esp_err_t ret = ESP_OK;
+  CHECK_STATUS(drv10975_forward_direction(&m_drv10975));
 
-  ret = nvs_flash_init();
-  if ((ESP_ERR_NVS_NO_FREE_PAGES == ret) || (ESP_ERR_NVS_NEW_VERSION_FOUND == ret))
-  {
-    ESP_ERROR_CHECK(nvs_flash_erase());
-    ESP_ERROR_CHECK(nvs_flash_init());
-  }
+  return BS_OK;
 }
 
-static inline void m_bsp_spiffs_init(void)
+base_status_t bsp_brc_reverse_direction(void)
 {
-  esp_err_t ret = ESP_OK;
-  ESP_LOGI(TAG, "Initializing SPIFFS");
+  CHECK_STATUS(drv10975_reverse_direction(&m_drv10975));
 
-  esp_vfs_spiffs_conf_t spiffs_init_cfg = 
-  {
-    .base_path              = "/spiffs",
-    .partition_label        = NULL,
-    .max_files              = 5,
-    .format_if_mount_failed = true
-  };
-  ret = esp_vfs_spiffs_register(&spiffs_init_cfg);
-
-  if (ESP_OK != ret)
-  {
-    ESP_LOGE(TAG, "SPIFFS init failed: %s", esp_err_to_name(ret));
-    return;
-  }
-
-  size_t total = 0, used = 0;
-  ret = esp_spiffs_info(NULL, &total, &used);
-
-  if (ESP_OK == ret)
-  {
-    ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
-  }
-  else
-  {
-    ESP_LOGE(TAG, "SPIFFS get info failed: %s", esp_err_to_name(ret));
-  }
+  return BS_OK;
 }
 
+base_status_t bsp_brc_set_motor_speed(uint16_t percent_speed)
+{
+  CHECK_STATUS(drv10975_set_motor_speed(&m_drv10975, percent_speed));
+
+  return BS_OK;
+}
+
+base_status_t bsp_brc_get_motor_velocity(void)
+{
+  CHECK_STATUS(drv10975_get_motor_velocity(&m_drv10975));
+
+  return BS_OK;
+}
+
+base_status_t bsp_brc_get_motor_period(void)
+{
+  CHECK_STATUS(drv10975_get_motor_period(&m_drv10975));
+
+  return BS_OK;
+}
+
+base_status_t bsp_brc_get_motor_supply_voltage(void)
+{
+  CHECK_STATUS(drv10975_get_motor_supply_voltage(&m_drv10975));
+
+  return BS_OK;
+}
+
+base_status_t bsp_brc_get_motor_current(void)
+{
+  CHECK_STATUS(drv10975_get_motor_current(&m_drv10975));
+
+  return BS_OK;
+}
+
+base_status_t bsp_brc_check_over_temp(void)
+{
+  CHECK_STATUS(drv10975_check_over_temp(&m_drv10975));
+
+  return BS_OK;
+}
+
+base_status_t bsp_brc_check_sleep_mode(void)
+{
+  CHECK_STATUS(drv10975_check_sleep_mode(&m_drv10975));
+
+  return BS_OK;
+}
+
+base_status_t bsp_brc_check_over_current(void)
+{
+  CHECK_STATUS(drv10975_check_over_current(&m_drv10975));
+
+  return BS_OK;
+}
+
+base_status_t bsp_brc_check_motor_lock(void)
+{
+  CHECK_STATUS(drv10975_check_motor_lock(&m_drv10975));
+
+  return BS_OK;
+}
+
+/* Private function definitions ---------------------------------------- */
 /* End of file -------------------------------------------------------- */
