@@ -50,7 +50,7 @@
 #define DRV10975_FORWARD_DIRECTION                 (0)
 #define DRV10975_REVERSE_DIRECTION                 (1)
 
-// DRV10975 direction 
+// DRV10975 motor max speed
 #define DRV10975_MOTOR_MAX_SPEED                   (0x1FF)
 
 /* Private enumerate/structure ---------------------------------------- */

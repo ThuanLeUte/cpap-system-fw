@@ -83,10 +83,10 @@ base_status_t iam20380_config(iam20380_t *me)
   
   tmp = 0x80;
   CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1)); // Reset chip, disable sleep mode, disable low power mode
-  me->delay_ms(50);
+  me->delay_ms(1000);
 
   tmp = 0x01;
-  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1)); // Enable temp sensor - set clock to internal PLL
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1)); // Enable temp sensor - auto select clock
   me->delay_ms(50);
   
   tmp = 0x00;
@@ -149,6 +149,11 @@ base_status_t iam20380_get_gyro_angle(iam20380_t *me)
 
 base_status_t iam20380_get_sensitivity(iam20380_t *me)
 {
+  uint8_t tmp;
+
+  CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1));
+  me->config.fullscale = (tmp & 0x18) >> 3;
+
   switch (me->config.fullscale)
   {
     case IAM20380_FULLSCALE_250_DPS : me->data.sensitivity = 131.0; break;
