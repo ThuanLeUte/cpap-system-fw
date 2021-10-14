@@ -125,7 +125,7 @@ base_status_t drv10975_reverse_direction(drv10975_t *me);
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t drv10975_set_motor_speed(drv10975_t *me, uint16_t percent_speed);
+base_status_t drv10975_set_motor_speed(drv10975_t *me, uint8_t percent_speed);
 
 /**
  * @brief         DRV10975 get motor velocity

@@ -46,7 +46,7 @@
 #define DRV10975_REG_SYS_OPT8                      (0X2A)
 #define DRV10975_REG_SYS_OPT9                      (0X2B)
 
-// DRV10975 direction 
+// DRV10975 direction state
 #define DRV10975_FORWARD_DIRECTION                 (0)
 #define DRV10975_REVERSE_DIRECTION                 (1)
 
@@ -117,7 +117,7 @@ base_status_t drv10975_reverse_direction(drv10975_t *me)
   return BS_OK;
 }
 
-base_status_t drv10975_set_motor_speed(drv10975_t *me, uint16_t percent_speed)
+base_status_t drv10975_set_motor_speed(drv10975_t *me, uint8_t percent_speed)
 {
   uint8_t tmp;
 
@@ -138,10 +138,13 @@ base_status_t drv10975_set_motor_speed(drv10975_t *me, uint16_t percent_speed)
 base_status_t drv10975_get_motor_velocity(drv10975_t *me)
 {
   uint8_t tmp[2];
+  uint16_t velocity;
 
   CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_MOTOR_SPEED1, &tmp, sizeof(tmp)));
 
-  me->value.velocity = (float)((tmp[0] << 8 | tmp[1]) / 10.0);
+  velocity = tmp[0] << 8 | tmp[1];
+
+  me->value.velocity = (float)(velocity / 10.0);
   
   return BS_OK;
 }
@@ -149,10 +152,13 @@ base_status_t drv10975_get_motor_velocity(drv10975_t *me)
 base_status_t drv10975_get_motor_period(drv10975_t *me)
 {
   uint8_t tmp[2];
+  uint16_t period;
 
   CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_MOTOR_PERIOD1, &tmp, sizeof(tmp)));
 
-  me->value.period = (float)((tmp[0] << 8 | tmp[1]) * 10);
+  period = tmp[0] << 8 | tmp[1];
+
+  me->value.period = (float)(period * 10.0);
 
   return BS_OK;
 }

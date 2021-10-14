@@ -76,7 +76,7 @@ base_status_t bsp_brc_reverse_direction(void);
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t bsp_brc_set_motor_speed(uint16_t percent_speed);
+base_status_t bsp_brc_set_motor_speed(uint8_t percent_speed);
 
 /**
  * @brief         BSP brushless motor driver get motor velocity

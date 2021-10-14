@@ -49,7 +49,7 @@ base_status_t bsp_brc_reverse_direction(void)
   return BS_OK;
 }
 
-base_status_t bsp_brc_set_motor_speed(uint16_t percent_speed)
+base_status_t bsp_brc_set_motor_speed(uint8_t percent_speed)
 {
   CHECK_STATUS(drv10975_set_motor_speed(&m_drv10975, percent_speed));
 
