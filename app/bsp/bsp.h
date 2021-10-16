@@ -23,6 +23,7 @@ extern "C" {
 #include "bsp_io_10.h"
 
 /* Public defines ----------------------------------------------------- */
+
 /* Public enumerate/structure ----------------------------------------- */
 /**
  * @brief Base status structure
@@ -49,7 +50,6 @@ bool_t;
 #define CHECK(expr, ret)            \
   do {                              \
     if (!(expr)) {                  \
-      ESP_LOGE(TAG, "%s", #expr);   \
       return (ret);                 \
     }                               \
   } while (0)
@@ -58,7 +58,6 @@ bool_t;
   do {                              \
     base_status_t ret = (expr);     \
     if (BS_OK != ret) {             \
-      ESP_LOGE(TAG, "%s", #expr);   \
       return (ret);                 \
     }                               \
   } while (0)
@@ -74,14 +73,14 @@ bool_t;
  *
  * @return        None
  */
-void bsp_hw_init(void);
+void bsp_init(void);
 
 /**
- * @brief         I2C read
+ * @brief         Board support package I2C read
  *
  * @param[in]     slave_addr    Slave address
  * @param[in]     reg_addr      Register address
- * @param[in]     p_data        Pointer to handle of data
+ * @param[in]     data        Pointer to handle of data
  * @param[in]     len           Data length
  *
  * @attention     None
@@ -90,7 +89,10 @@ void bsp_hw_init(void);
  * - 0      Succes
  * - 1      Error
  */
-int bsp_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint8_t *p_data, uint32_t len);
+int bsp_i2c_read(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len);
+int bsp_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len);
+void bsp_delay_ms(uint32_t ms);
+void bsp_gpio_write(uint8_t pin , uint8_t state);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus

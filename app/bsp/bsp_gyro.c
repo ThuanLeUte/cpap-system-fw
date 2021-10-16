@@ -30,9 +30,9 @@ base_status_t bsp_gyro_init(void)
   m_iam20380.i2c_write                    = bsp_i2c_write;
   m_iam20380.delay_ms                     = bsp_delay_ms;
   // Configuration
-  m_iam20380->config.sample_rate          = IAM20380_SAMPLE_RATE_500HZ;
-  m_iam20380->config.digi_low_pass_filter = IAM20380_DLPF4_NBW31;
-  m_iam20380->config.fullscale            = IAM20380_FULLSCALE_2000_DPS;
+  m_iam20380.config.sample_rate          = IAM20380_SAMPLE_RATE_500HZ;
+  m_iam20380.config.digi_low_pass_filter = IAM20380_DLPF4_NBW31;
+  m_iam20380.config.fullscale            = IAM20380_FULLSCALE_2000_DPS;
 
   CHECK_STATUS(iam20380_init(&m_iam20380));
 

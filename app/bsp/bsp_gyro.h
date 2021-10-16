@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 /* Includes ----------------------------------------------------------- */
-#include "bsp_gyro.h"
+#include "iam20380.h"
 
 /* Public defines ----------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------- */
@@ -50,7 +50,7 @@ base_status_t bsp_gyro_init(void);
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t bsp_gyro_get_raw_data(void)
+base_status_t bsp_gyro_get_raw_data(void);
 
 /**
  * @brief         BSP GyroScope calculate gyro angle
@@ -63,7 +63,7 @@ base_status_t bsp_gyro_get_raw_data(void)
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t bsp_gyro_get_gyro_angle(void)
+base_status_t bsp_gyro_get_gyro_angle(void);
 
 /**
  * @brief         BSP GyroScope get sensitivity
@@ -76,7 +76,7 @@ base_status_t bsp_gyro_get_gyro_angle(void)
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t bsp_gyro_get_sensitivity(void)
+base_status_t bsp_gyro_get_sensitivity(void);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus

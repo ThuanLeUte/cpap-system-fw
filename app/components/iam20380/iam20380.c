@@ -67,7 +67,7 @@ base_status_t iam20380_init(iam20380_t *me)
 {
   uint8_t identifier;
 
-  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL || (me->delay_ms == NULL))
+  if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL) || (me->delay_ms == NULL))
     return BS_ERROR_PARAMS;
 
   CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_WHO_AM_I, &identifier, 1)); // IAM20380 check identity
@@ -138,7 +138,7 @@ base_status_t iam20380_get_raw_data(iam20380_t *me)
 base_status_t iam20380_get_gyro_angle(iam20380_t *me)
 {
   CHECK_STATUS(iam20380_get_sensitivity(me));
-  CHECK_STATUS(iam20380_get_raw_data(me);
+  CHECK_STATUS(iam20380_get_raw_data(me));
 
   me->data.angle.x = (float)(me->data.raw_data.x) / me->data.sensitivity;
   me->data.angle.y = (float)(me->data.raw_data.y) / me->data.sensitivity;

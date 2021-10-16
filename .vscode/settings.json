@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "bsp.h": "c",
+        "bsp_gyro.h": "c",
+        "drv10975.h": "c",
+        "iam20380.h": "c"
+    }
+}

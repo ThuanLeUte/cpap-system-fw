@@ -131,7 +131,7 @@ base_status_t pac1934_config(pac1934_t *me);
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t pac1934_voltage_measurement(pac1934_t *me, pac1934_channel_t channel)
+base_status_t pac1934_voltage_measurement(pac1934_t *me, pac1934_channel_t channel);
 
 /**
  * @brief         PAC1934 measure current
@@ -145,7 +145,7 @@ base_status_t pac1934_voltage_measurement(pac1934_t *me, pac1934_channel_t chann
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t pac1934_current_measurement(pac1934_t *me, pac1934_channel_t channel)
+base_status_t pac1934_current_measurement(pac1934_t *me, pac1934_channel_t channel);
 
 /**
  * @brief         PAC1934 measure power
@@ -159,7 +159,7 @@ base_status_t pac1934_current_measurement(pac1934_t *me, pac1934_channel_t chann
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t pac1934_power_measurement(pac1934_t *me, pac1934_channel_t channel)
+base_status_t pac1934_power_measurement(pac1934_t *me, pac1934_channel_t channel);
 
 /**
  * @brief         PAC1934 into sleep mode

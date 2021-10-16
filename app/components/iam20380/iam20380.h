@@ -134,7 +134,6 @@ iam20380_t;
 
 /* Public function prototypes ----------------------------------------- */
 /**
-/**
  * @brief         IAM20380 init
  *
  * @param[in]     me      Pointer to handle of IAM20380 module.
@@ -148,6 +147,19 @@ iam20380_t;
 base_status_t iam20380_init(iam20380_t *me);
 
 /**
+ * @brief         IAM20380 config
+ *
+ * @param[in]     me      Pointer to handle of IAM20380 module.
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+base_status_t iam20380_config(iam20380_t *me);
+
+/**
  * @brief         IAM20380 read raw data
  *
  * @param[in]     me            Pointer to handle of IAM20380 module.
@@ -157,7 +169,7 @@ base_status_t iam20380_init(iam20380_t *me);
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t iam20380_get_raw_data(iam20380_t *me)
+base_status_t iam20380_get_raw_data(iam20380_t *me);
 
 /**
  * @brief         IAM20380 calculate gyro angle
@@ -169,7 +181,7 @@ base_status_t iam20380_get_raw_data(iam20380_t *me)
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t iam20380_get_gyro_angle(iam20380_t *me)
+base_status_t iam20380_get_gyro_angle(iam20380_t *me);
 
 /**
  * @brief         IAM20380 get sensitivity
@@ -181,7 +193,7 @@ base_status_t iam20380_get_gyro_angle(iam20380_t *me)
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t iam20380_get_sensitivity(iam20380_t *me)
+base_status_t iam20380_get_sensitivity(iam20380_t *me);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus

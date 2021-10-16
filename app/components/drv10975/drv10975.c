@@ -12,6 +12,7 @@
 
 /* Includes ----------------------------------------------------------- */
 #include "drv10975.h"
+#include "bsp_io_10.h"
 
 /* Private defines ---------------------------------------------------- */
 // DRV10975 Registers
@@ -59,7 +60,7 @@
 /* Private variables -------------------------------------------------- */
 /* Private function prototypes ---------------------------------------- */
 static base_status_t m_drv10975_read_reg(drv10975_t *me, uint8_t reg, uint8_t *p_data, uint32_t len);
-static base_status_t m_drv10975_write_reg(drv10975_t *me, uint8_t reg, uint8_t *p_data, uint32_t len);
+static base_status_t m_drv10975_write_reg(drv10975_t *me, uint8_t reg, uint8_t data);
 static uint16_t m_drv10975_modifed_map(uint16_t x, uint16_t in_min, uint16_t in_max, uint16_t out_min, uint16_t out_max);
 
 /* Function definitions ----------------------------------------------- */
@@ -68,7 +69,7 @@ base_status_t drv10975_init(drv10975_t *me)
   if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL) || (me->delay_ms == NULL))
     return BS_ERROR;
 
-  CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_EE_CTRL, 0X40)); // Enable the writing to configuration register
+  CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_EE_CTRL, 0x40)); // Enable the writing to configuration register
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_MOTOR_PARAM1, 0x39)); // Set motor resistance
 
@@ -140,7 +141,7 @@ base_status_t drv10975_get_motor_velocity(drv10975_t *me)
   uint8_t tmp[2];
   uint16_t velocity;
 
-  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_MOTOR_SPEED1, &tmp, sizeof(tmp)));
+  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_MOTOR_SPEED1, tmp, sizeof(tmp)));
 
   velocity = tmp[0] << 8 | tmp[1];
 
@@ -154,7 +155,7 @@ base_status_t drv10975_get_motor_period(drv10975_t *me)
   uint8_t tmp[2];
   uint16_t period;
 
-  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_MOTOR_PERIOD1, &tmp, sizeof(tmp)));
+  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_MOTOR_PERIOD1, tmp, sizeof(tmp)));
 
   period = tmp[0] << 8 | tmp[1];
 
@@ -167,7 +168,7 @@ base_status_t drv10975_get_motor_supply_voltage(drv10975_t *me)
 {
   uint8_t tmp;
 
-  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_SUPPLY_VOLTAGE, &tmp, 1);
+  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_SUPPLY_VOLTAGE, &tmp, 1));
 
   me->value.supply_voltage = (float)(tmp * 22.8 / 256.0);
 
@@ -179,7 +180,7 @@ base_status_t drv10975_get_motor_current(drv10975_t *me)
   uint8_t tmp[2];
   uint16_t current;
 
-  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_MOTOR_CURRENT1, &tmp, sizeof(tmp)));
+  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_MOTOR_CURRENT1, tmp, sizeof(tmp)));
 
   current = (((tmp[0] & 0x07) << 8) | tmp[1]);
 
@@ -199,7 +200,7 @@ base_status_t drv10975_check_over_temp(drv10975_t *me)
 {
   uint8_t tmp;
 
-  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_STATUS, &tmp, 1);
+  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_STATUS, &tmp, 1));
 
   me->status = tmp & 0x80;
 
@@ -210,7 +211,7 @@ base_status_t drv10975_check_sleep_mode(drv10975_t *me)
 {
   uint8_t tmp;
 
-  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_STATUS, &tmp, 1);
+  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_STATUS, &tmp, 1));
 
   me->status = tmp & 0x40;
 
@@ -221,7 +222,7 @@ base_status_t drv10975_check_over_current(drv10975_t *me)
 {
   uint8_t tmp;
 
-  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_STATUS, &tmp, 1);
+  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_STATUS, &tmp, 1));
 
   me->status = tmp & 0x20;
 
@@ -232,7 +233,7 @@ base_status_t drv10975_check_motor_lock(drv10975_t *me)
 {
   uint8_t tmp;
 
-  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_STATUS, &tmp, 1);
+  CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_STATUS, &tmp, 1));
 
   me->status = tmp & 0x10;
 
@@ -262,7 +263,7 @@ static base_status_t m_drv10975_read_reg(drv10975_t *me, uint8_t reg, uint8_t *p
 }
 
 /**
- * @brief         DRV10975 read register
+ * @brief         DRV10975 write register
  *
  * @param[in]     me      Pointer to handle of DRV10975 module.
  * @param[in]     reg     Register

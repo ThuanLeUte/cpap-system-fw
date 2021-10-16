@@ -16,7 +16,6 @@
 /* Private defines ---------------------------------------------------------- */
 static const char *TAG = "BSP";
 
-
 /* Public variables --------------------------------------------------------- */
 /* Private variables -------------------------------------------------------- */
 /* Private function prototypes ---------------------------------------------- */
@@ -32,8 +31,6 @@ void bsp_init(void)
 
 
 /* Private function --------------------------------------------------------- */
-
-
 static inline void m_bsp_nvs_init(void)
 {
   esp_err_t ret = ESP_OK;
@@ -79,4 +76,23 @@ static inline void m_bsp_spiffs_init(void)
   }
 }
 
+int bsp_i2c_read(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len)
+{
+  return 0;
+}
+
+int bsp_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len)
+{
+  return 0;
+}
+
+void bsp_delay_ms(uint32_t ms)
+{
+
+}
+
+void bsp_gpio_write(uint8_t pin , uint8_t state)
+{
+
+}
 /* End of file -------------------------------------------------------- */

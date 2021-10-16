@@ -87,13 +87,13 @@ base_status_t pac1934_init(pac1934_t *me)
   if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL) || (me->delay_ms == NULL))
     return BS_ERROR_PARAMS;
 
-  CHECK_STATUS(m_iam20380_read_reg(me, PAC1934_REG_REV_ID, &identifier, 1)); // PAC1934 check revision ID
+  CHECK_STATUS(m_pac1934_read_reg(me, PAC1934_REG_REV_ID, &identifier, 1)); // PAC1934 check revision ID
   CHECK(PAC1934_REV_ID_IDENTIFIER == identifier, BS_ERROR); 
 
-  CHECK_STATUS(m_iam20380_read_reg(me, PAC1934_REG_MANU_ID, &identifier, 1)); // PAC1934 check manufacturer ID
+  CHECK_STATUS(m_pac1934_read_reg(me, PAC1934_REG_MANU_ID, &identifier, 1)); // PAC1934 check manufacturer ID
   CHECK(PAC1934_MANU_ID_IDENTIFIER == identifier, BS_ERROR); 
 
-  CHECK_STATUS(m_iam20380_read_reg(me, PAC1934_REG_PRODUCT_ID, &identifier, 1)); // PAC1934 check product ID
+  CHECK_STATUS(m_pac1934_read_reg(me, PAC1934_REG_PRODUCT_ID, &identifier, 1)); // PAC1934 check product ID
   CHECK(PAC1934_PRODUCT_ID_IDENTIFIER == identifier, BS_ERROR); 
 
   CHECK_STATUS(pac1934_config(me));
@@ -152,7 +152,6 @@ base_status_t pac1934_current_measurement(pac1934_t *me, pac1934_channel_t chann
   uint8_t   tmp_vsense[2];
   uint16_t  vsense;
   double    d_vsense;
-  double    isense;
   double    imax;
   double    rsense;
   double    fullscalecurrent;
@@ -198,7 +197,7 @@ base_status_t pac1934_power_measurement(pac1934_t *me, pac1934_channel_t channel
 
   CHECK_STATUS(m_pac1934_read_reg(me, register_addr, tmp_vpower, sizeof(tmp_vpower)));
 
-  vpower |= (tmp_vpower[0] << 24) || (tmp_vpower[1] << 16) || (tmp_vpower[2] << 8) || tmp_vpower[3];
+  vpower = ((tmp_vpower[0] << 24) | (tmp_vpower[1] << 16) | (tmp_vpower[2] << 8) | tmp_vpower[3]);
 
   imax                = (double)(FULLSCALE_RANGE) / (0.004);
   rsense              = (FULLSCALE_RANGE) / (imax);
@@ -208,14 +207,14 @@ base_status_t pac1934_power_measurement(pac1934_t *me, pac1934_channel_t channel
   {
     vpower              = ((0xFFFFFFFF) - (vpower)) + 1;
     d_vpower            = (double)vpower;
-    proppower           = (d_vpower / (0xFFFFFFF0);
-    me->data.power      = (fullscalerangepower * proppower);
+    proppower           = (d_vpower / (0xFFFFFFF0));
+    me->data.power      = fullscalerangepower * proppower;
   }
   else
   {
     d_vpower            = (double)vpower;
     proppower           = (d_vpower / 0x7FFFFFF0);
-    me->data.power      = (fullscalerangepower * proppower);
+    me->data.power      = fullscalerangepower * proppower;
   }
 
   return BS_OK;
@@ -300,7 +299,7 @@ static base_status_t m_pac1934_write_reg(pac1934_t *me, uint8_t reg, uint8_t dat
  */
 static base_status_t m_pac1934_refresh(pac1934_t *me)
 {
-  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_REFRESH, 0x00);
+  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_REFRESH, 0x00));
   me->delay_ms(100);
 
   return BS_OK;
@@ -319,7 +318,7 @@ static base_status_t m_pac1934_refresh(pac1934_t *me)
  */
 static base_status_t m_pac1934_refresh_v(pac1934_t *me)
 {
-  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_REFRESH_V, 0x00);
+  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_REFRESH_V, 0x00));
   me->delay_ms(100);
 
   return BS_OK;

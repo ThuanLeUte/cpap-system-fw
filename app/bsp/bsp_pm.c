@@ -37,35 +37,35 @@ base_status_t bsp_pm_init(void)
   return BS_OK;
 }
 
-base_status_t bsp_pm_voltage_measurement(pac1934_channel_t channel);
+base_status_t bsp_pm_voltage_measurement(pac1934_channel_t channel)
 {
   CHECK_STATUS(pac1934_voltage_measurement(&m_pac1934, channel));
 
   return BS_OK;
 }
 
-base_status_t bsp_pm_current_measurement(pac1934_channel_t channel);
+base_status_t bsp_pm_current_measurement(pac1934_channel_t channel)
 {
   CHECK_STATUS(pac1934_current_measurement(&m_pac1934, channel));
 
   return BS_OK;
 }
 
-base_status_t bsp_pm_power_measurement(pac1934_channel_t channel);
+base_status_t bsp_pm_power_measurement(pac1934_channel_t channel)
 {
   CHECK_STATUS(pac1934_power_measurement(&m_pac1934, channel));
 
   return BS_OK;
 }
 
-base_status_t bsp_pm_into_sleep_mode(void);
+base_status_t bsp_pm_into_sleep_mode(void)
 {
   CHECK_STATUS(pac1934_into_sleep_mode(&m_pac1934));
 
   return BS_OK;
 }
 
-base_status_t bsp_pm_into_normal_mode(void);
+base_status_t bsp_pm_into_normal_mode(void)
 {
   CHECK_STATUS(pac1934_into_normal_mode(&m_pac1934));
 

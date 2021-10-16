@@ -7,6 +7,7 @@ PROJECT_NAME := esp32-idf-aws-fw
 PROJECT_VER  := v1.0.0
 
 EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/sys/
+EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/bsp/
 
 include $(IDF_PATH)/make/project.mk
 
