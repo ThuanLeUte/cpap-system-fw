@@ -60,7 +60,6 @@
 /* Private function prototypes ---------------------------------------- */
 static base_status_t m_iam20380_read_reg(iam20380_t *me, uint8_t reg, uint8_t *p_data, uint32_t len);
 static base_status_t m_iam20380_write_reg(iam20380_t *me, uint8_t reg, uint8_t *p_data, uint32_t len);
-static base_status_t m_iam20380_write_one_byte(iam20380_t *me, uint8_t reg, uint8_t data);
 
 /* Function definitions ----------------------------------------------- */
 base_status_t iam20380_init(iam20380_t *me)
@@ -205,26 +204,6 @@ static base_status_t m_iam20380_read_reg(iam20380_t *me, uint8_t reg, uint8_t *p
 static base_status_t m_iam20380_write_reg(iam20380_t *me, uint8_t reg, uint8_t *p_data, uint32_t len)
 {
   CHECK(0 == me->i2c_write(me->device_address, reg, p_data, len), BS_ERROR);
-
-  return BS_OK;
-}
-
-/**
- * @brief         IAM20380 write one byte
- *
- * @param[in]     me      Pointer to handle of IAM20380 module.
- * @param[in]     reg     Register
- * @param[in]     data    Data
- *
- * @attention     None
- *
- * @return
- * - BS_OK
- * - BS_ERROR
- */
-static base_status_t m_iam20380_write_one_byte(iam20380_t *me, uint8_t reg, uint8_t data)
-{
-  CHECK(0 == me->i2c_write(me->device_address, reg, data, 1), BS_ERROR);
 
   return BS_OK;
 }

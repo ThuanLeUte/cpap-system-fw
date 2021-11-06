@@ -28,23 +28,16 @@ base_status_t bsp_brc_init(void)
   m_drv10975.i2c_read       = bsp_i2c_read;
   m_drv10975.i2c_write      = bsp_i2c_write;
   m_drv10975.delay_ms       = bsp_delay_ms;
-  m_drv10975.gpio_write     = bsp_gpio_write;
+  m_drv10975.gpio_write     = bsp_io_write;
 
   CHECK_STATUS(drv10975_init(&m_drv10975));
 
   return BS_OK;
 }
 
-base_status_t bsp_brc_forward_direction(void)
+base_status_t bsp_brc_set_motor_direction(uint8_t dir)
 {
-  CHECK_STATUS(drv10975_forward_direction(&m_drv10975));
-
-  return BS_OK;
-}
-
-base_status_t bsp_brc_reverse_direction(void)
-{
-  CHECK_STATUS(drv10975_reverse_direction(&m_drv10975));
+  CHECK_STATUS(drv10975_set_motor_direction(&m_drv10975, dir));
 
   return BS_OK;
 }

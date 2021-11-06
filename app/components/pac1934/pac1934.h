@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 /* Includes ----------------------------------------------------------- */
-#include "bsp.h"
+ #include "bsp.h"
 
 /* Public defines ----------------------------------------------------- */
 #define PAC1934_I2C_ADDR                       (0x11) // 7 Bits

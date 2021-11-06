@@ -44,8 +44,12 @@ extern "C" {
 #include "esp_event.h"
 #include "nvs_flash.h"
 #include "esp_spiffs.h"
+#include "esp_timer.h"
 
-/* Public defines ----------------------------------------------------- */
+/* Public defines ----------------------------------------------------------- */
+#define HI_UINT16(a) (((a) >> 8) & 0xFF)
+#define LO_UINT16(a) ((a) & 0xFF)
+
 /* Public enumerate/structure ----------------------------------------------- */
 /* Public Constants --------------------------------------------------------- */
 /* Public variables --------------------------------------------------------- */

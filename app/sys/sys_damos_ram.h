@@ -1,5 +1,5 @@
 /**
- * @file       sys_damos_ram.c
+ * @file       sys_damos_ram.h
  * @copyright  Copyright (C) 2020 ThuanLe. All rights reserved.
  * @license    This project is released under the ThuanLe License.
  * @version    1.0.0
@@ -17,11 +17,13 @@
 /* Includes ----------------------------------------------------------- */
 #include <stdint.h>
 
-
 /* Public defines ----------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------- */
 /* Public macros ------------------------------------------------------ */
 /* Public variables --------------------------------------------------- */
+extern uint16_t g_shutdown_ms;
+extern uint64_t g_epoch_time;
+
 /* Public function prototypes ----------------------------------------- */
 
 #endif // __SYS_DAMOS_RAM_H

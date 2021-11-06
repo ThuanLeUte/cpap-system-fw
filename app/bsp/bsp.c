@@ -25,10 +25,13 @@ static inline void m_bsp_spiffs_init(void);
 /* Function definitions ----------------------------------------------------- */
 void bsp_init(void)
 {
+  bsp_io_init();
+  bsp_led_init();
+  bsp_buzz_init();
+
   m_bsp_nvs_init();
   m_bsp_spiffs_init();
 }
-
 
 /* Private function --------------------------------------------------------- */
 static inline void m_bsp_nvs_init(void)
@@ -88,11 +91,7 @@ int bsp_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t 
 
 void bsp_delay_ms(uint32_t ms)
 {
-
+  vTaskDelay(pdMS_TO_TICKS(ms)); 
 }
 
-void bsp_gpio_write(uint8_t pin , uint8_t state)
-{
-
-}
 /* End of file -------------------------------------------------------- */

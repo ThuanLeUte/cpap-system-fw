@@ -42,28 +42,15 @@ base_status_t bsp_brc_init(void);
 /**
  * @brief         BSP brushless motor driver set reverse direction for motor
  *
- * @param[in]     None
- *
+ * @param[in]     dir       Motor direction
+ * 
  * @attention     None
  *
  * @return
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t bsp_brc_forward_direction(void);
-
-/**
- * @brief         BSP brushless motor driver set reverse direction for motor
- *
- * @param[in]     None
- *
- * @attention     None
- *
- * @return
- * - BS_OK
- * - BS_ERROR
- */
-base_status_t bsp_brc_reverse_direction(void);
+base_status_t bsp_brc_set_motor_direction(uint8_t dir);
 
 /**
  * @brief         BSP brushless motor driver set motor speed

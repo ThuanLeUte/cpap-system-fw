@@ -1,81 +1,97 @@
 /**
-* @file       bsp.c
-* @copyright  Copyright (C) 2021 ThuanLe. All rights reserved.
-* @license    This project is released under the ThuanLe License.
-* @version    01.00.00
-* @date       2021-03-13
-* @author     ThuanLe
-* @brief      BSP (Board Support Package)
-* @note       None
-* @example    None
-*/
+ * @file       bsp_rtc.c
+ * @copyright  Copyright (C) 2020 Hydratech. All rights reserved.
+ * @license    This project is released under the Hydratech License.
+ * @version    1.0.0
+ * @date       2021-11-05
+ * @author     Hiep Le
+ * @brief      Board support package for RTC driver (PCF85063)
+ * @note       None
+ * @example    None
+ */
 
-/* Includes ----------------------------------------------------------------- */
-#include "bsp.h"
+/* Includes ----------------------------------------------------------- */
+#include "bsp_rtc.h"
 
-/* Private defines ---------------------------------------------------------- */
-static const char *TAG = "BSP";
+/* Private defines ---------------------------------------------------- */
+/* Private enumerate/structure ---------------------------------------- */
+/* Private macros ----------------------------------------------------- */
+/* Public variables --------------------------------------------------- */
+/* Private variables -------------------------------------------------- */
+static pcf85063_t m_pcf85063;
 
-/* Public variables --------------------------------------------------------- */
-/* Private variables -------------------------------------------------------- */
-/* Private function prototypes ---------------------------------------------- */
-static inline void m_bsp_nvs_init(void);
-static inline void m_bsp_spiffs_init(void);
-
-/* Function definitions ----------------------------------------------------- */
-void bsp_init(void)
+/* Private function prototypes ---------------------------------------- */
+/* Function definitions ----------------------------------------------- */
+base_status_t bsp_rtc_init(void)
 {
-  m_bsp_nvs_init();
-  m_bsp_spiffs_init();
+  m_pcf85063.device_address = PCF85063_I2C_ADDR;
+  m_pcf85063.i2c_read       = bsp_i2c_read;
+  m_pcf85063.i2c_write      = bsp_i2c_write;
+
+  CHECK_STATUS(pcf85063_init(&m_pcf85063));
+
+  return BS_OK;
 }
 
-
-/* Private function --------------------------------------------------------- */
-
-
-static inline void m_bsp_nvs_init(void)
+base_status_t bsp_rtc_get_time(uint64_t epoch_time)
 {
-  esp_err_t ret = ESP_OK;
+  CHECK_STATUS(pcf85063_get_time(&m_pcf85063, &epoch_time));
 
-  ret = nvs_flash_init();
-  if ((ESP_ERR_NVS_NO_FREE_PAGES == ret) || (ESP_ERR_NVS_NEW_VERSION_FOUND == ret))
-  {
-    ESP_ERROR_CHECK(nvs_flash_erase());
-    ESP_ERROR_CHECK(nvs_flash_init());
-  }
+  return BS_OK;
 }
 
-static inline void m_bsp_spiffs_init(void)
+base_status_t bsp_rtc_set_time(uint64_t epoch_time)
 {
-  esp_err_t ret = ESP_OK;
-  ESP_LOGI(TAG, "Initializing SPIFFS");
+  CHECK_STATUS(pcf85063_set_time(&m_pcf85063, epoch_time));
 
-  esp_vfs_spiffs_conf_t spiffs_init_cfg = 
-  {
-    .base_path              = "/spiffs",
-    .partition_label        = NULL,
-    .max_files              = 5,
-    .format_if_mount_failed = true
-  };
-  ret = esp_vfs_spiffs_register(&spiffs_init_cfg);
-
-  if (ESP_OK != ret)
-  {
-    ESP_LOGE(TAG, "SPIFFS init failed: %s", esp_err_to_name(ret));
-    return;
-  }
-
-  size_t total = 0, used = 0;
-  ret = esp_spiffs_info(NULL, &total, &used);
-
-  if (ESP_OK == ret)
-  {
-    ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
-  }
-  else
-  {
-    ESP_LOGE(TAG, "SPIFFS get info failed: %s", esp_err_to_name(ret));
-  }
+  return BS_OK;
 }
 
+htime_t bsp_rtc_epoch_to_htime(uint64_t t)
+{
+  time_t mtime = (time_t)t;
+  struct tm *htime;
+  htime_t res;
+
+  htime = localtime(&mtime);
+
+  res.year  = (uint16_t)(htime->tm_year + 1900);
+  res.month = (uint8_t)(htime->tm_mon + 1);
+  res.day   = (uint8_t)(htime->tm_mday);
+  res.hour  = (uint8_t)(htime->tm_hour);
+  res.min   = (uint8_t)(htime->tm_min);
+  res.sec   = (uint8_t)(htime->tm_sec);
+
+  return res;
+}
+
+uint64_t bsp_rtc_htime_to_epoch(htime_t t)  
+{
+  struct tm htime = {0};
+
+  htime.tm_year = t.year - 1900;
+  htime.tm_mon  = t.month - 1;
+  htime.tm_mday = t.day;
+  htime.tm_hour = t.hour;
+  htime.tm_min  = t.min;
+  htime.tm_sec  = t.sec;
+
+  return (uint64_t)mktime(&htime);
+}
+
+void bsp_rtc_makestring_timestyle_1(char *out, time_t timestamp)
+{
+  time_t mtime = (time_t)timestamp;
+  struct tm *htime;
+
+  htime = localtime(&mtime);
+
+  // strftime(out, 14, "%y%m%d:%H%M%S", htime);
+
+  strftime(out, 100, "%d/%m/20%y-%H:%M:%S", htime);
+
+  // out[10] = splitter;
+}
+
+/* Private function definitions ---------------------------------------- */
 /* End of file -------------------------------------------------------- */

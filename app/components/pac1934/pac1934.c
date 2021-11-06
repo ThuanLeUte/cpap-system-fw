@@ -187,7 +187,6 @@ base_status_t pac1934_power_measurement(pac1934_t *me, pac1934_channel_t channel
   uint8_t   tmp_vpower[4];
   uint32_t  vpower;
   double    d_vpower;
-  double    isense;
   double    imax;
   double    rsense;
   double    fullscalerangepower; 

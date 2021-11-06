@@ -1,101 +1,56 @@
 /**
- * @file       bsp.h
+ * @file       bsp_rtc.h
  * @copyright  Copyright (C) 2020 Hydratech. All rights reserved.
  * @license    This project is released under the Hydratech License.
  * @version    1.0.0
- * @date       2021-01-23
- * @author     Thuan Le
- * @brief      Board Support Package (BSP)
+ * @date       2021-11-05
+ * @author     Hiep Le
+ * @brief      Board support package for RTC driver (PCF85063)
  * @note       None
  * @example    None
  */
 
 /* Define to prevent recursive inclusion ------------------------------ */
-#ifndef __BSP_H
-#define __BSP_H
+#ifndef __BSP_RTC_H
+#define __BSP_RTC_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Includes ----------------------------------------------------------- */
-#include "platform_common.h"
-#include "bsp_io_10.h"
+#include "pcf85063.h"
 
 /* Public defines ----------------------------------------------------- */
+/* Public macros ------------------------------------------------------ */
+/* Public variables --------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------- */
 /**
- * @brief Base status structure
+ * @brief Human readable time struct
  */
-typedef enum
+typedef struct
 {
-  BS_OK = 0x00,
-  BS_ERROR_PARAMS,
-  BS_ERROR
+  uint16_t year;
+  uint8_t  month;
+  uint8_t  day;
+  uint8_t  hour;
+  uint8_t  min;
+  uint8_t  sec;
 }
-base_status_t;
+htime_t;
 
-/**
- * @brief Bool structure
- */
-typedef enum
-{
-  BS_FALSE = 0x00,
-  BS_TRUE  = 0x01
-}
-bool_t;
-
-/* Public macros ------------------------------------------------------ */
-#define CHECK(expr, ret)            \
-  do {                              \
-    if (!(expr)) {                  \
-      ESP_LOGE(TAG, "%s", #expr);   \
-      return (ret);                 \
-    }                               \
-  } while (0)
-
-#define CHECK_STATUS(expr)          \
-  do {                              \
-    base_status_t ret = (expr);     \
-    if (BS_OK != ret) {             \
-      ESP_LOGE(TAG, "%s", #expr);   \
-      return (ret);                 \
-    }                               \
-  } while (0)
-
-/* Public variables --------------------------------------------------- */
 /* Public function prototypes ----------------------------------------- */
-/**
- * @brief         Board support package init
- *
- * @param[in]     None
- *
- * @attention     None
- *
- * @return        None
- */
-void bsp_hw_init(void);
-
-/**
- * @brief         I2C read
- *
- * @param[in]     slave_addr    Slave address
- * @param[in]     reg_addr      Register address
- * @param[in]     p_data        Pointer to handle of data
- * @param[in]     len           Data length
- *
- * @attention     None
- *
- * @return
- * - 0      Succes
- * - 1      Error
- */
-int bsp_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint8_t *p_data, uint32_t len);
+base_status_t bsp_rtc_init(void);
+base_status_t bsp_rtc_get_time(uint64_t epoch_time);
+base_status_t bsp_rtc_set_time(uint64_t epoch_time);
+htime_t bsp_rtc_epoch_to_htime(uint64_t t);
+uint64_t bsp_rtc_htime_to_epoch(htime_t t);
+void bsp_rtc_makestring_timestyle_1(char *out, time_t timestamp);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
 } // extern "C"
 #endif
-#endif // __BSP_H
+#endif // __BSP_RTC_H
 
 /* End of file -------------------------------------------------------- */

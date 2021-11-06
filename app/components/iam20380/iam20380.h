@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 /* Includes ----------------------------------------------------------- */
-#include "bsp.h"
+ #include "bsp.h"
 
 /* Public defines ----------------------------------------------------- */
 #define IAM20380_I2C_ADDR                       (0x68) // 7 Bits

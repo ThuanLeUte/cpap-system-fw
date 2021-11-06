@@ -104,16 +104,9 @@ base_status_t drv10975_init(drv10975_t *me)
   return BS_OK;
 }
 
-base_status_t drv10975_forward_direction(drv10975_t *me)
+base_status_t drv10975_set_motor_direction(drv10975_t *me, uint8_t dir)
 {
-  me->gpio_write(IO_DRV_DIR, DRV10975_FORWARD_DIRECTION);
-
-  return BS_OK;
-}
-
-base_status_t drv10975_reverse_direction(drv10975_t *me)
-{
-  me->gpio_write(IO_DRV_DIR, DRV10975_REVERSE_DIRECTION);
+  me->gpio_write(IO_BRC_DIR, dir);
 
   return BS_OK;
 }

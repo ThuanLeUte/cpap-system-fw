@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 /* Includes ----------------------------------------------------------- */
-#include "bsp.h"
+ #include "bsp.h"
 
 /* Public defines ----------------------------------------------------- */
 #define DRV10975_I2C_ADDR                       (0x52) // 7 Bits
@@ -88,30 +88,18 @@ drv10975_t;
 base_status_t drv10975_init(drv10975_t *me);
 
 /**
- * @brief         DRV10975 set forward direction for motor
+ * @brief         DRV10975 set motor direction
  *
  * @param[in]     me      Pointer to handle of DRV10975 module.
- *
+ * @param[in]     dir     Motor direction
+ * 
  * @attention     None
  *
  * @return
  * - BS_OK
  * - BS_ERROR
  */
-base_status_t drv10975_forward_direction(drv10975_t *me);
-
-/**
- * @brief         DRV10975 set reverse direction for motor
- *
- * @param[in]     me      Pointer to handle of DRV10975 module.
- *
- * @attention     None
- *
- * @return
- * - BS_OK
- * - BS_ERROR
- */
-base_status_t drv10975_reverse_direction(drv10975_t *me);
+base_status_t drv10975_set_motor_direction(drv10975_t *me, uint8_t dir);
 
 /**
  * @brief         DRV10975 set motor speed in percent
