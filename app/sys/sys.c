@@ -54,32 +54,32 @@ void sys_boot(void)
 
 void sys_run(void)
 {
-  if(g_epoch_time != epoch_time)
-  {
-    epoch_time = g_epoch_time;
+  // if(g_epoch_time != epoch_time)
+  // {
+  //   epoch_time = g_epoch_time;
 
-    bsp_rtc_makestring_timestyle_1(out, epoch_time);
+  //   bsp_rtc_makestring_timestyle_1(out, epoch_time);
 
-    ESP_LOGE(TAG, "Date time: %s", out);
+  //   ESP_LOGE(TAG, "Date time: %s", out);
 
-    htime = bsp_rtc_epoch_to_htime(epoch_time);
+  //   htime = bsp_rtc_epoch_to_htime(epoch_time);
 
-    ESP_LOGE(TAG, "Human date time: %d-%d-%d-%d-%d-%d", htime.hour, htime.min, htime.sec, htime.day, htime.month, htime.year);
+  //   ESP_LOGE(TAG, "Human date time: %d-%d-%d-%d-%d-%d", htime.hour, htime.min, htime.sec, htime.day, htime.month, htime.year);
 
-    epoch_time_cvrt = bsp_rtc_htime_to_epoch(htime);
+  //   epoch_time_cvrt = bsp_rtc_htime_to_epoch(htime);
 
-    ESP_LOGE(TAG, "Epoch Time: %li", (long int) epoch_time_cvrt);
-  }
+  //   ESP_LOGE(TAG, "Epoch Time: %li", (long int) epoch_time_cvrt);
+  // }
 
-  bsp_delay_ms(100);
+  // bsp_delay_ms(100);
 
 
-  // bsp_led_dim(IO_LED_RED, 0, 100, 2000);
+  bsp_led_dim(IO_LED_RED, 0, 100, 1500);
   // bsp_buzz_set_duty(90);
-  // bsp_delay_ms(2000); 
-  // bsp_led_dim(IO_LED_RED, 100, 0, 2000);
+  bsp_delay_ms(2000); 
+  bsp_led_dim(IO_LED_RED, 100, 0, 1500);
   // bsp_buzz_set_duty(10);
-  // bsp_delay_ms(2000);    
+  bsp_delay_ms(2000);    
 }
 
 void sys_task_create(void)

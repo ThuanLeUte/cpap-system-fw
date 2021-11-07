@@ -27,16 +27,16 @@ static void m_bsp_io_isr_handler(void* arg);
 void bsp_io_init(void)
 {
   gpio_pad_select_gpio(IO_BRC_DIR);
-  gpio_pad_select_gpio(IO_BUZZER);
-  gpio_pad_select_gpio(IO_LED_GREEN);
-  gpio_pad_select_gpio(IO_LED_RED);
+  // gpio_pad_select_gpio(IO_BUZZER);
+  // gpio_pad_select_gpio(IO_LED_GREEN);
+  // gpio_pad_select_gpio(IO_LED_RED);
   gpio_pad_select_gpio(IO_POWER_LATCH);
   gpio_pad_select_gpio(IO_POWER_KEY);
 
   gpio_set_direction(IO_BRC_DIR,     GPIO_MODE_OUTPUT);
-  gpio_set_direction(IO_BUZZER,      GPIO_MODE_OUTPUT);
-  gpio_set_direction(IO_LED_GREEN,   GPIO_MODE_OUTPUT);
-  gpio_set_direction(IO_LED_RED,     GPIO_MODE_OUTPUT);
+  // gpio_set_direction(IO_BUZZER,      GPIO_MODE_OUTPUT);
+  // gpio_set_direction(IO_LED_GREEN,   GPIO_MODE_OUTPUT);
+  // gpio_set_direction(IO_LED_RED,     GPIO_MODE_OUTPUT);
   gpio_set_direction(IO_POWER_LATCH, GPIO_MODE_OUTPUT);
   gpio_set_direction(IO_POWER_KEY,   GPIO_MODE_INPUT);
 

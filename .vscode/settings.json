@@ -46,6 +46,8 @@
         "limits": "c",
         "condition_variable": "cpp",
         "mutex": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "esp_adc_cal.h": "c",
+        "bsp_adc.h": "c"
     }
 }

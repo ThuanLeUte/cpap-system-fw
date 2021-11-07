@@ -70,5 +70,10 @@ void bsp_power_shutdown_device_task(void *pvParameter)
     }
   }
 }
+
+void bsp_power_init(void)
+{
+  bsp_power_start_up_device_check();
+}
   
 /* End of file -------------------------------------------------------- */

@@ -23,12 +23,11 @@
 #include "ble_tss.h"
 
 /* Private defines ---------------------------------------------------- */
-static const char *TAG = "BSP_TSS";
-
 /* Private macros ----------------------------------------------------------- */
 #define BLE_TSS_LOAD_EPOCH_TIME()   g_epoch_time = ble_tss_epoch_time
 
 /* Private variables -------------------------------------------------- */
+static const char *TAG = "BSP_TSS";
 int32_t ble_tss_epoch_time = 0;
 
 const uint8_t TSS_CHAR_UUID[][16] =

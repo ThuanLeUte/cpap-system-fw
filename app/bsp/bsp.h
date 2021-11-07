@@ -25,6 +25,7 @@ extern "C" {
 #include "bsp_power.h"
 #include "bsp_led.h"
 #include "bsp_buzz.h"
+#include "bsp_adc.h"
 
 /* Public defines ----------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------- */

@@ -44,7 +44,7 @@ extern "C" {
 #define IO_BUZZER                       (16)    // Buzzer control pin                               // 16 default
 #define IO_THERM                        (18)    // Thermistor signal pin
 #define IO_LED_GREEN                    (19)    // LED green control pin
-#define IO_LED_RED                      (22)    // LED red control pin 
+#define IO_LED_RED                      (2)    // LED red control pin 
 #define IO_POWER_LATCH                  (21)    // Power supply latch pin
 #define IO_POWER_KEY                    (23)    // Button power/function pin
 #define IO_BAT_LEVEL                    (35)    // Battery voltage measure pin      
