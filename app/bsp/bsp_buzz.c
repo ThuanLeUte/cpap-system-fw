@@ -21,7 +21,7 @@
 #define BSP_BUZZ_TIMER_CLK_CFG        LEDC_AUTO_CLK
 #define BSP_BUZZ_PWM_FREQ             (2700)
 #define BSP_BUZZ_PWM_SPEED_MODE       LEDC_HIGH_SPEED_MODE      
-#define BSP_BUZZ_PWM_CHANNEL_NUM      LEDC_CHANNEL_0
+#define BSP_BUZZ_PWM_CHANNEL_NUM      LEDC_CHANNEL_2
 #define BSP_BUZZ_GPIO_NUM             IO_BUZZER
 
 /* Public variables --------------------------------------------------------- */

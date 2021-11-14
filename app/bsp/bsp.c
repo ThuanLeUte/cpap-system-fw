@@ -27,6 +27,7 @@ void bsp_init(void)
 {
   bsp_io_init();
   // bsp_power_init();
+  bsp_i2c_init();
   bsp_adc_init();
   bsp_led_init();
   bsp_buzz_init();
@@ -79,16 +80,6 @@ static inline void m_bsp_spiffs_init(void)
   {
     ESP_LOGE(TAG, "SPIFFS get info failed: %s", esp_err_to_name(ret));
   }
-}
-
-int bsp_i2c_read(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len)
-{
-  return 0;
-}
-
-int bsp_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len)
-{
-  return 0;
 }
 
 void bsp_delay_ms(uint32_t ms)

@@ -26,6 +26,7 @@ extern "C" {
 #include "bsp_led.h"
 #include "bsp_buzz.h"
 #include "bsp_adc.h"
+#include "bsp_i2c.h"
 
 /* Public defines ----------------------------------------------------- */
 /* Public enumerate/structure ----------------------------------------- */
@@ -78,38 +79,6 @@ bool_t;
  * @return        None
  */
 void bsp_init(void);
-
-/**
- * @brief         Board support package I2C read
- *
- * @param[in]     slave_addr    Slave address
- * @param[in]     reg_addr      Register address
- * @param[in]     data          Pointer to handle of data
- * @param[in]     len           Data length
- *
- * @attention     None
- *
- * @return
- * - 0      Succes
- * - 1      Error
- */
-int bsp_i2c_read(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len);
-
-/**
- * @brief         Board support package I2C write
- *
- * @param[in]     slave_addr    Slave address
- * @param[in]     reg_addr      Register address
- * @param[in]     data          Pointer to handle of data
- * @param[in]     len           Data length
- *
- * @attention     None
- *
- * @return
- * - 0      Succes
- * - 1      Error
- */
-int bsp_i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len);
 
 /**
  * @brief         Board support package delay ms

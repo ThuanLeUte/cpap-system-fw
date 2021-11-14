@@ -48,6 +48,9 @@
         "mutex": "cpp",
         "thread": "cpp",
         "esp_adc_cal.h": "c",
-        "bsp_adc.h": "c"
+        "bsp_adc.h": "c",
+        "i2c.h": "c",
+        "bsp_i2c.h": "c",
+        "i2c_bus.h": "c"
     }
 }
