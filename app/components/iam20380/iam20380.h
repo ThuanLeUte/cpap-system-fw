@@ -22,7 +22,7 @@ extern "C" {
  #include "bsp.h"
 
 /* Public defines ----------------------------------------------------- */
-#define IAM20380_I2C_ADDR                       (0x68) // 7 Bits
+#define IAM20380_I2C_ADDR                       (0x68 << 1) // I2C bus need 8 bits address
 
 /* Public enumerate/structure ----------------------------------------- */
 /**

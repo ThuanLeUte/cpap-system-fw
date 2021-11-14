@@ -29,7 +29,7 @@ extern "C" {
 /* Private function prototypes ---------------------------------------- */
 /* Public variables --------------------------------------------------- */
 /* Public defines ----------------------------------------------------- */
-#define PCF85063_I2C_ADDR             (0x51) // Default I2C address of PCF85063
+#define PCF85063_I2C_ADDR             (0x51 << 1) // I2C bus need 8 bits address
 
 /* Public enumerate/structure ----------------------------------------- */
 typedef struct

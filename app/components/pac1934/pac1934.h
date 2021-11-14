@@ -22,7 +22,7 @@ extern "C" {
  #include "bsp.h"
 
 /* Public defines ----------------------------------------------------- */
-#define PAC1934_I2C_ADDR                       (0x11) // 7 Bits
+#define PAC1934_I2C_ADDR                       (0x11 << 1) // I2C bus need 8 bits address
 
 /* Public enumerate/structure ----------------------------------------- */
 /**
