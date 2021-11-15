@@ -51,6 +51,7 @@
         "bsp_adc.h": "c",
         "i2c.h": "c",
         "bsp_i2c.h": "c",
-        "i2c_bus.h": "c"
+        "i2c_bus.h": "c",
+        "sstream": "c"
     }
 }

@@ -43,7 +43,7 @@ void sys_boot(void)
 {
   bsp_init(); 
 
-  bsp_brc_init();
+  // bsp_brc_init();
   // bsp_gyro_init();
   // bsp_pm_init();
   // bsp_rtc_init();
@@ -75,11 +75,19 @@ void sys_run(void)
 
 
   bsp_led_dim(IO_LED_RED, 0, 100, 2000);
-  // bsp_buzz_set_duty(90);
-  bsp_delay_ms(2500); 
+  bsp_delay_ms(2200); 
   bsp_led_dim(IO_LED_RED, 100, 0, 2000);
-  // bsp_buzz_set_duty(10);
-  bsp_delay_ms(2500);    
+  bsp_delay_ms(2200);    
+
+  // bsp_buzz_set_duty(70);
+  // bsp_delay_ms(200);
+  // bsp_buzz_set_duty(0);
+  // bsp_delay_ms(2000);
+
+  // bsp_brc_init();
+  // bsp_gyro_init();
+  // bsp_pm_init();
+  // bsp_rtc_init();
 }
 
 void sys_task_create(void)
