@@ -37,6 +37,7 @@
 /* Private enumerate/structure ---------------------------------------- */
 /* Public variables --------------------------------------------------- */
 /* Private variables -------------------------------------------------- */
+static const char *TAG = "PCF85063";
 /* Private function prototypes ---------------------------------------- */
 static uint8_t m_pcf85063_bin_to_bcd(uint8_t val);
 static uint8_t m_pcf85063_bcd_to_bin(uint8_t val);
@@ -117,19 +118,19 @@ base_status_t pcf85063_set_time(pcf85063_t *me, uint64_t epoch_time)
 base_status_t pcf85063_get_time(pcf85063_t *me, uint64_t *epoch_time)
 {
   uint8_t tmp[7];
-  struct tm *htime = {0};
+  struct tm htime;
   
   CHECK_STATUS(m_pcf85063_read_reg(me, PCF85063_REG_SECONDS, tmp, sizeof(tmp)));
 
-  htime->tm_sec  = m_pcf85063_bcd_to_bin(tmp[0] & 0x7F);
-  htime->tm_min  = m_pcf85063_bcd_to_bin(tmp[1] & 0x7F);
-  htime->tm_hour = m_pcf85063_bcd_to_bin(tmp[2] & 0x3F);        // RTC hr 0-23
-  htime->tm_mday = m_pcf85063_bcd_to_bin(tmp[3] & 0x3F);
-  htime->tm_wday =                      (tmp[4] & 0x07);
-  htime->tm_mon  = m_pcf85063_bcd_to_bin(tmp[5] & 0x1F) - 1;    // RTC mn 1-12
-  htime->tm_year = m_pcf85063_bcd_to_bin(tmp[6] & 0xFF) + 100;  // Adjust for 1900 base of rtc_time
+  htime.tm_sec  = m_pcf85063_bcd_to_bin(tmp[0] & 0x7F);
+  htime.tm_min  = m_pcf85063_bcd_to_bin(tmp[1] & 0x7F);
+  htime.tm_hour = m_pcf85063_bcd_to_bin(tmp[2] & 0x3F);        // RTC hr 0-23
+  htime.tm_mday = m_pcf85063_bcd_to_bin(tmp[3] & 0x3F);
+  htime.tm_wday =                      (tmp[4] & 0x07);
+  htime.tm_mon  = m_pcf85063_bcd_to_bin(tmp[5] & 0x1F) - 1;    // RTC mn 1-12
+  htime.tm_year = m_pcf85063_bcd_to_bin(tmp[6] & 0xFF) + 100;  // Adjust for 1900 base of rtc_time
 
-  *epoch_time = (uint64_t)(mktime(htime));
+  *epoch_time = (uint64_t)(mktime(&htime));
 
   return BS_OK;
 }

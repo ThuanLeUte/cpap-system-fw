@@ -41,7 +41,7 @@ htime_t;
 
 /* Public function prototypes ----------------------------------------- */
 base_status_t bsp_rtc_init(void);
-base_status_t bsp_rtc_get_time(uint64_t epoch_time);
+base_status_t bsp_rtc_get_time(uint64_t *epoch_time);
 base_status_t bsp_rtc_set_time(uint64_t epoch_time);
 htime_t bsp_rtc_epoch_to_htime(uint64_t t);
 uint64_t bsp_rtc_htime_to_epoch(htime_t t);

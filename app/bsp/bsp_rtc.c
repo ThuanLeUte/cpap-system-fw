@@ -33,9 +33,9 @@ base_status_t bsp_rtc_init(void)
   return BS_OK;
 }
 
-base_status_t bsp_rtc_get_time(uint64_t epoch_time)
+base_status_t bsp_rtc_get_time(uint64_t *epoch_time)
 {
-  CHECK_STATUS(pcf85063_get_time(&m_pcf85063, &epoch_time));
+  CHECK_STATUS(pcf85063_get_time(&m_pcf85063, epoch_time));
 
   return BS_OK;
 }
