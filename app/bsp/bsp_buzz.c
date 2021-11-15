@@ -24,6 +24,8 @@
 #define BSP_BUZZ_PWM_CHANNEL_NUM      LEDC_CHANNEL_2
 #define BSP_BUZZ_GPIO_NUM             IO_BUZZER
 
+#define BSP_BUZZ_ON_DUTY             (70)
+
 /* Public variables --------------------------------------------------------- */
 /* Private variables -------------------------------------------------------- */
 // static const char *TAG = "bsp_buzz";
@@ -63,6 +65,16 @@ void bsp_buzz_set_duty(uint8_t duty)
   ledc_set_duty(bsp_buzz_channel.speed_mode, bsp_buzz_channel.channel, bsp_buzz_duty_map(duty));
 
   ledc_update_duty(bsp_buzz_channel.speed_mode, bsp_buzz_channel.channel);
+}
+
+void bsp_buzz_on(void)
+{
+  bsp_buzz_set_duty(BSP_BUZZ_ON_DUTY);
+}
+
+void bsp_buzz_off(void)
+{
+  bsp_buzz_set_duty(0);
 }
 
 uint32_t bsp_buzz_duty_map(uint8_t duty)

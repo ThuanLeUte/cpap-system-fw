@@ -69,8 +69,8 @@ extern "C" {
 #define IO_BRC_DIR                      (27)    // DRV10975 motor direction control pin
 #define IO_BUZZER                       (16)    // Buzzer control pin                           
 #define IO_THERM                        (18)    // Thermistor signal pin
-#define IO_LED_GREEN                    (19)    // LED green control pin
-#define IO_LED_RED                      (22)    // LED red control pin 
+#define IO_LED_RED                      (19)    // LED green control pin
+#define IO_LED_GREEN                    (22)    // LED red control pin 
 #define IO_POWER_LATCH                  (21)    // Power supply latch pin
 #define IO_POWER_KEY                    (34)    // Button power/function pin
 #define IO_BAT_LEVEL                    (35)    // Battery voltage measure pin      

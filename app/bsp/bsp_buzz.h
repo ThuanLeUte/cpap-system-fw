@@ -31,7 +31,8 @@ extern "C" {
 void bsp_buzz_init(void);
 void bsp_buzz_set_duty(uint8_t duty);
 uint32_t bsp_buzz_duty_map(uint8_t duty);
-
+void bsp_buzz_on(void);
+void bsp_buzz_off(void);
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus
 } // extern "C"
