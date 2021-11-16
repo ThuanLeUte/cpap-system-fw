@@ -57,6 +57,8 @@
 /* Private macros ----------------------------------------------------- */
 /* Public variables --------------------------------------------------- */
 /* Private variables -------------------------------------------------- */
+static const char *TAG = "IAM20380";
+
 /* Private function prototypes ---------------------------------------- */
 static base_status_t m_iam20380_read_reg(iam20380_t *me, uint8_t reg, uint8_t *p_data, uint32_t len);
 static base_status_t m_iam20380_write_reg(iam20380_t *me, uint8_t reg, uint8_t *p_data, uint32_t len);
@@ -70,6 +72,7 @@ base_status_t iam20380_init(iam20380_t *me)
     return BS_ERROR_PARAMS;
 
   CHECK_STATUS(m_iam20380_read_reg(me, IAM20380_REG_WHO_AM_I, &identifier, 1)); // IAM20380 check identity
+
   CHECK(IAM20380_VALUE_IDENTIFIER == identifier, BS_ERROR); 
 
   CHECK_STATUS(iam20380_config(me)); // IAM20380 config
