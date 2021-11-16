@@ -29,10 +29,11 @@ extern "C" {
 /* Public variables --------------------------------------------------- */
 /* Public function prototypes ----------------------------------------- */
 void bsp_led_init(void);
-// void bsp_led_dim(uint32_t led, uint32_t duty_x, uint32_t duty_y, uint32_t time);
 void bsp_led_dim(uint32_t led, uint8_t duty_x, uint8_t duty_y, uint32_t time);
-void bsp_led_set_duty(uint32_t led, uint8_t duty);
+void bsp_led_set_duty(uint32_t led, uint8_t duty);                 
 uint32_t bsp_led_duty_map(uint8_t duty);
+void LED_ON(uint32_t led);
+void LED_OFF(void);                 
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus

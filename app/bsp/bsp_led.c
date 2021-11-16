@@ -29,6 +29,7 @@
 #define BSP_LED_PWM_CHANNEL_0         LEDC_CHANNEL_0
 #define BSP_LED_PWM_CHANNEL_1         LEDC_CHANNEL_1
 
+/* Private macros ----------------------------------------------------- */
 /* Public variables --------------------------------------------------------- */
 /* Private variables -------------------------------------------------------- */
 // static const char *TAG = "bsp_led";
@@ -127,6 +128,19 @@ void bsp_led_set_duty(uint32_t led, uint8_t duty)
 
   ledc_set_duty(bsp_led_channel[index].speed_mode, bsp_led_channel[index].channel, bsp_led_duty_map(duty));
   ledc_update_duty(bsp_led_channel[index].speed_mode, bsp_led_channel[index].channel);
+}
+
+void LED_ON(uint32_t led)                
+{
+  bsp_led_set_duty(led, 80); 
+  if(led == IO_LED_GREEN)    bsp_led_set_duty(IO_LED_RED, 0);
+  else if(led == IO_LED_RED) bsp_led_set_duty(IO_LED_GREEN, 0); 
+}
+
+void LED_OFF(void)                 
+{
+  bsp_led_set_duty(IO_LED_RED, 0); 
+  bsp_led_set_duty(IO_LED_GREEN, 0);
 }
 
 uint32_t bsp_led_duty_map(uint8_t duty)
