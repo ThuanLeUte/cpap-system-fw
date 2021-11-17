@@ -18,6 +18,7 @@
 /* Private macros ----------------------------------------------------- */
 /* Public variables --------------------------------------------------- */
 /* Private variables -------------------------------------------------- */
+static const char *TAG = "bsp_brc";
 static drv10975_t m_drv10975;
 
 /* Private function prototypes ---------------------------------------- */

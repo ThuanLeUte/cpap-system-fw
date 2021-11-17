@@ -31,8 +31,10 @@ extern uint8_t count;
 
 /* Public function prototypes ----------------------------------------- */
 void bsp_power_init(void);
-void bsp_power_start_up_device_check(void);
+void bsp_power_start_up_device_task(void);
 void bsp_power_shutdown(void);
+void bsp_power_shutdown_indicate(void);
+void bsp_power_startup_indicate(void);
 void bsp_power_shutdown_device_task(void *pvParameter);
 
 /* -------------------------------------------------------------------------- */

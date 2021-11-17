@@ -18,6 +18,9 @@
 #include <stdint.h>
 
 /* Public defines ----------------------------------------------------- */
+#define POWER_KEY_TIMEOUT               (2000000) // 2s
+#define TIME_OUT_DIVISION               (100000)
+
 /* Public enumerate/structure ----------------------------------------- */
 /* Public macros ------------------------------------------------------ */
 /* Public variables --------------------------------------------------- */

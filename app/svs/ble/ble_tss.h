@@ -24,8 +24,6 @@ extern "C" {
 /* Public macros ------------------------------------------------------ */
 /* Public enumerate/structure ----------------------------------------- */
 /* Public variables --------------------------------------------------- */
-extern int32_t ble_tss_epoch_time;
-
 /* Public defines ----------------------------------------------------- */
 #define TSS_BASE_UUID(uuid) 0x41, 0xEE, 0x68, 0x3A, 0x99, 0x0F, 0x0E, 0x72, 0x85, 0x49, 0x8D, 0xB3, LO_UINT16(uuid), HI_UINT16(uuid), 0x00, 0x00
 

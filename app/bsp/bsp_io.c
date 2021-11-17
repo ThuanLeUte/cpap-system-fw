@@ -27,22 +27,16 @@ static void m_bsp_io_isr_handler(void* arg);
 void bsp_io_init(void)
 {
   gpio_pad_select_gpio(IO_BRC_DIR);
-  // gpio_pad_select_gpio(IO_BUZZER);
-  // gpio_pad_select_gpio(IO_LED_GREEN);
-  // gpio_pad_select_gpio(IO_LED_RED);
   gpio_pad_select_gpio(IO_POWER_LATCH);
   gpio_pad_select_gpio(IO_POWER_KEY);
 
   gpio_set_direction(IO_BRC_DIR,     GPIO_MODE_OUTPUT);
-  // gpio_set_direction(IO_BUZZER,      GPIO_MODE_OUTPUT);
-  // gpio_set_direction(IO_LED_GREEN,   GPIO_MODE_OUTPUT);
-  // gpio_set_direction(IO_LED_RED,     GPIO_MODE_OUTPUT);
   gpio_set_direction(IO_POWER_LATCH, GPIO_MODE_OUTPUT);
   gpio_set_direction(IO_POWER_KEY,   GPIO_MODE_INPUT);
 
   gpio_pullup_en(IO_POWER_KEY);
   gpio_intr_enable(IO_POWER_KEY);
-  gpio_set_intr_type(IO_POWER_KEY, GPIO_INTR_NEGEDGE);
+  gpio_set_intr_type(IO_POWER_KEY, GPIO_INTR_POSEDGE);
   gpio_install_isr_service(0);
   gpio_isr_handler_add(IO_POWER_KEY, m_bsp_io_isr_handler, (void*) IO_POWER_KEY);
 }
@@ -60,7 +54,7 @@ int bsp_io_read(uint8_t pin)
 /* Private function --------------------------------------------------------- */
 static void m_bsp_io_isr_handler(void* arg)
 {
-  g_shutdown_ms = 30;
+  g_shutdown_ms = (POWER_KEY_TIMEOUT / TIME_OUT_DIVISION);
 }
 
 /* End of file -------------------------------------------------------- */

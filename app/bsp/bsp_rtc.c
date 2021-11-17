@@ -18,6 +18,7 @@
 /* Private macros ----------------------------------------------------- */
 /* Public variables --------------------------------------------------- */
 /* Private variables -------------------------------------------------- */
+static const char *TAG = "bsp_rtc";
 static pcf85063_t m_pcf85063;
 
 /* Private function prototypes ---------------------------------------- */
@@ -79,6 +80,19 @@ uint64_t bsp_rtc_htime_to_epoch(htime_t t)
   return (uint64_t)mktime(&htime);
 }
 
+void bsp_rtc_realtime_synchronize(uint64_t epoch_time)
+{
+  uint64_t epoch_time_cvrt = 0;
+  htime_t stime;
+
+  bsp_rtc_set_time(epoch_time);
+  // bsp_delay_ms(3000);
+  bsp_rtc_get_time(&epoch_time_cvrt);
+  ESP_LOGI(TAG, "Epoch Time: %li", (long int)epoch_time_cvrt);
+  stime = bsp_rtc_epoch_to_htime(epoch_time_cvrt);
+  ESP_LOGI(TAG, "Human date time: %d:%d:%d___%d/%d/%d", stime.hour, stime.min, stime.sec, stime.day, stime.month, stime.year);
+}
+
 void bsp_rtc_makestring_timestyle_1(char *out, time_t timestamp)
 {
   time_t mtime = (time_t)timestamp;
@@ -89,8 +103,6 @@ void bsp_rtc_makestring_timestyle_1(char *out, time_t timestamp)
   // strftime(out, 14, "%y%m%d:%H%M%S", htime);
 
   strftime(out, 100, "%d/%m/20%y-%H:%M:%S", htime);
-
-  // out[10] = splitter;
 }
 
 /* Private function definitions ---------------------------------------- */

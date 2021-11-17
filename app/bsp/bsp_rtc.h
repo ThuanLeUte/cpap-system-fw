@@ -46,6 +46,7 @@ base_status_t bsp_rtc_set_time(uint64_t epoch_time);
 htime_t bsp_rtc_epoch_to_htime(uint64_t t);
 uint64_t bsp_rtc_htime_to_epoch(htime_t t);
 void bsp_rtc_makestring_timestyle_1(char *out, time_t timestamp);
+void bsp_rtc_realtime_synchronize(uint64_t epoch_time);
 
 /* -------------------------------------------------------------------------- */
 #ifdef __cplusplus

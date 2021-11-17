@@ -21,14 +21,17 @@
 #include "host/ble_gap.h"
 
 #include "ble_tss.h"
+#include "bsp_rtc.h"
 
 /* Private defines ---------------------------------------------------- */
 /* Private macros ----------------------------------------------------------- */
-#define BLE_TSS_LOAD_EPOCH_TIME()   g_epoch_time = ble_tss_epoch_time
+#define LOAD_EPOCH_TIME()           g_epoch_time = m_ble_tss_epoch_time
+#define SYNC_REAL_TIME_LOG()        bsp_rtc_realtime_synchronize(g_epoch_time)
+#define SYNC_REAL_TIME()            bsp_rtc_set_time(g_epoch_time)
 
 /* Private variables -------------------------------------------------- */
 static const char *TAG = "BSP_TSS";
-int32_t ble_tss_epoch_time = 0;
+static uint64_t m_ble_tss_epoch_time = 0;
 
 const uint8_t TSS_CHAR_UUID[][16] =
 {
@@ -92,11 +95,12 @@ static int m_ble_tss_access(uint16_t conn_handle, uint16_t attr_handle,
   {
     if (ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR)
     {
-      rc = m_ble_tss_chr_write(ctxt->om, 0, 4, &ble_tss_epoch_time, NULL);
+      rc = m_ble_tss_chr_write(ctxt->om, 0, 4, &m_ble_tss_epoch_time, NULL);
       
-      BLE_TSS_LOAD_EPOCH_TIME();
+      LOAD_EPOCH_TIME();
 
-      ESP_LOGE(TAG, "Epoch Time: %li", (long int) ble_tss_epoch_time);
+      // SYNC_REAL_TIME();
+      SYNC_REAL_TIME_LOG();
     }
   }
 
