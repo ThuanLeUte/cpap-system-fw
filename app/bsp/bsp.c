@@ -27,6 +27,7 @@ void bsp_init(void)
 {
   bsp_io_init();
   // bsp_power_init();
+
   bsp_i2c_init();
   bsp_adc_init();
   bsp_led_init();
