@@ -73,6 +73,8 @@
 /* Private macros ----------------------------------------------------- */
 /* Public variables --------------------------------------------------- */
 /* Private variables -------------------------------------------------- */
+static const char *TAG = "pac1934";
+
 /* Private function prototypes ---------------------------------------- */
 static base_status_t m_pac1934_read_reg(pac1934_t *me, uint8_t reg, uint8_t *p_data, uint32_t len);
 static base_status_t m_pac1934_write_reg(pac1934_t *me, uint8_t reg, uint8_t data);
@@ -298,7 +300,9 @@ static base_status_t m_pac1934_write_reg(pac1934_t *me, uint8_t reg, uint8_t dat
  */
 static base_status_t m_pac1934_refresh(pac1934_t *me)
 {
-  CHECK_STATUS(m_pac1934_write_reg(me, PAC1934_REG_REFRESH, 0x00));
+  uint8_t data = 0;
+
+  CHECK(0 == me->i2c_write_data(me->device_address, &data, 1), BS_ERROR);
   me->delay_ms(100);
 
   return BS_OK;

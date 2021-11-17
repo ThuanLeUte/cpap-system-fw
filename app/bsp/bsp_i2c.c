@@ -60,6 +60,20 @@ int bsp_i2c_read(uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t l
   return ret;
 }
 
+int bsp_i2c_write_data(uint8_t slave_addr, uint8_t *data, uint32_t len)
+{
+  int ret = 0;
+  ret = i2c_bus_write_data(m_i2c_hdl, slave_addr, data, len);
+  if (ret != 0)
+  {
+    ESP_LOGE(TAG, "i2c error: %d", ret);
+    i2c_bus_delete(m_i2c_hdl);
+    bsp_i2c_init();
+    ret = i2c_bus_write_data(m_i2c_hdl, slave_addr, data, len);
+  }
+  return ret;
+}
+
 /* Private function definitions--------------------------------------------------------- */
 esp_err_t bsp_i2c_init(void)
 {

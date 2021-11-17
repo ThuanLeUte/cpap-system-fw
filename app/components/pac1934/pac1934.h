@@ -87,6 +87,8 @@ typedef struct
   // Write n-bytes from device's internal address <reg_addr> via I2C bus
   int (*i2c_write) (uint8_t slave_addr, uint8_t reg_addr, uint8_t *data, uint32_t len);
 
+  int (*i2c_write_data) (uint8_t slave_addr, uint8_t *data, uint32_t len);
+
   // Delay a time period in milisecond
   void (*delay_ms) (uint32_t ms);
 }

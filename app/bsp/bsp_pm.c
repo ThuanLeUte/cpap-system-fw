@@ -27,9 +27,10 @@ base_status_t bsp_pm_init(void)
   m_pac1934.device_address        = PAC1934_I2C_ADDR;
   m_pac1934.i2c_read              = bsp_i2c_read;
   m_pac1934.i2c_write             = bsp_i2c_write;
+  m_pac1934.i2c_write_data        = bsp_i2c_write_data;
   m_pac1934.delay_ms              = bsp_delay_ms;
 
-  m_pac1934.config.sample_rate    = PAC1934_SAMPLE_RATE_1000HZ;
+  m_pac1934.config.sample_rate    = PAC1934_SAMPLE_RATE_8HZ;
   m_pac1934.config.sleep_mode_bit = 0; // 1: Sleep mode, 0: Normal mode
 
   CHECK_STATUS(pac1934_init(&m_pac1934));

@@ -25,6 +25,7 @@
 /* Private defines ---------------------------------------------------------- */
 /* Private Constants -------------------------------------------------------- */
 static const char *TAG = "SYS";
+uint16_t volt = 0;
 
 /* Private macros ----------------------------------------------------------- */
 /* Private enumerate/structure ---------------------------------------------- */
@@ -40,14 +41,17 @@ void sys_boot(void)
 
   bsp_rtc_init();
   bsp_gyro_init();
+  bsp_pm_init();
 
   // bsp_brc_init();
-  // bsp_pm_init();
 
   ble_init();
   sys_task_create();
 
   // bsp_power_startup_indicate();
+
+  // bsp_adc_get_voltage(&volt);
+  // ESP_LOGE(TAG, "v = %d", volt);
 }
 
 void sys_run(void)
