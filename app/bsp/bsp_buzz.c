@@ -24,7 +24,7 @@
 #define BSP_BUZZ_PWM_CHANNEL_NUM      LEDC_CHANNEL_2
 #define BSP_BUZZ_GPIO_NUM             IO_BUZZER
 
-#define BSP_BUZZ_ON_DUTY             (70)
+#define BSP_BUZZ_ON_DUTY             (90)
 
 /* Public variables --------------------------------------------------------- */
 /* Private variables -------------------------------------------------------- */
@@ -67,12 +67,12 @@ void bsp_buzz_set_duty(uint8_t duty)
   ledc_update_duty(bsp_buzz_channel.speed_mode, bsp_buzz_channel.channel);
 }
 
-void bsp_buzz_on(void)
+void BUZZ_ON(void)
 {
   bsp_buzz_set_duty(BSP_BUZZ_ON_DUTY);
 }
 
-void bsp_buzz_off(void)
+void BUZZ_OFF(void)
 {
   bsp_buzz_set_duty(0);
 }
