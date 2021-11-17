@@ -88,7 +88,7 @@ base_status_t iam20380_config(iam20380_t *me)
   me->delay_ms(1000);
 
   tmp = 0x01;
-  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1)); // Enable temp sensor - auto select clock
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_PWR_MGMT_1, &tmp, 1)); // Auto select clock
   me->delay_ms(50);
   
   tmp = 0x00;
@@ -105,6 +105,10 @@ base_status_t iam20380_config(iam20380_t *me)
 
   tmp = (me->config.fullscale << 3) & 0x18;
   CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_GYRO_CONFIG, &tmp, 1)); // Set fulscale 
+  me->delay_ms(50);
+
+  tmp = me->config.low_power_mode_cfg;
+  CHECK_STATUS(m_iam20380_write_reg(me, IAM20380_REG_LP_MODE_CFG, &tmp, 1)); // Set up low power mode  
   me->delay_ms(50);
 
   tmp = 0x01;

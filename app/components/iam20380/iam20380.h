@@ -58,15 +58,33 @@ iam20380_digi_low_pass_filter_t;
  */
 typedef enum
 {
-      IAM20380_SAMPLE_RATE_1000HZ = 0x00
-    , IAM20380_SAMPLE_RATE_500HZ  = 0x01
-    , IAM20380_SAMPLE_RATE_200HZ  = 0x04
-    , IAM20380_SAMPLE_RATE_125HZ  = 0x07
-    , IAM20380_SAMPLE_RATE_100HZ  = 0x09
-    , IAM20380_SAMPLE_RATE_50HZ   = 0x13
-    , IAM20380_SAMPLE_RATE_20HZ   = 0x31
+      IAM20380_SAMPLE_RATE_1000HZ = (0)
+    , IAM20380_SAMPLE_RATE_500HZ  = (1)
+    , IAM20380_SAMPLE_RATE_200HZ  = (4)
+    , IAM20380_SAMPLE_RATE_125HZ  = (7)
+    , IAM20380_SAMPLE_RATE_100HZ  = (9)
+    , IAM20380_SAMPLE_RATE_50HZ   = (19)
+    , IAM20380_SAMPLE_RATE_20HZ   = (49)
+    , IAM20380_SAMPLE_RATE_10HZ   = (99)
 }
 iam20380_sample_rate_t;
+
+/**
+ * @brief IAM20380 low power mode config enum
+ */
+typedef enum
+{
+      IAM20380_LP_MODE_CFG_GYRO_CYCLE     = 0x80
+    , IAM20380_LP_MODE_CFG_G_AVGCFG_1X    = 0x00
+    , IAM20380_LP_MODE_CFG_G_AVGCFG_2X    = 0x10
+    , IAM20380_LP_MODE_CFG_G_AVGCFG_4X    = 0x20
+    , IAM20380_LP_MODE_CFG_G_AVGCFG_8X    = 0x30
+    , IAM20380_LP_MODE_CFG_G_AVGCFG_16X   = 0x40
+    , IAM20380_LP_MODE_CFG_G_AVGCFG_32X   = 0x50
+    , IAM20380_LP_MODE_CFG_G_AVGCFG_64X   = 0x60
+    , IAM20380_LP_MODE_CFG_G_AVGCFG_128X  = 0x70
+}
+iam20380_low_power_mode_cfg_t;
 
 /**
  * @brief IAM20380 angle data
@@ -76,6 +94,7 @@ typedef struct
   iam20380_fullscale_t fullscale;
   iam20380_digi_low_pass_filter_t digi_low_pass_filter;
   iam20380_sample_rate_t sample_rate;
+  iam20380_low_power_mode_cfg_t low_power_mode_cfg;
 }
 iam20380_config_t;
 
