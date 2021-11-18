@@ -58,6 +58,8 @@
 /* Private macros ----------------------------------------------------- */
 /* Public variables --------------------------------------------------- */
 /* Private variables -------------------------------------------------- */
+static const char *TAG = "drv10975";
+
 /* Private function prototypes ---------------------------------------- */
 static base_status_t m_drv10975_read_reg(drv10975_t *me, uint8_t reg, uint8_t *p_data, uint32_t len);
 static base_status_t m_drv10975_write_reg(drv10975_t *me, uint8_t reg, uint8_t data);
@@ -66,39 +68,55 @@ static uint16_t m_drv10975_modifed_map(uint16_t x, uint16_t in_min, uint16_t in_
 /* Function definitions ----------------------------------------------- */
 base_status_t drv10975_init(drv10975_t *me)
 {
+  me->delay_ms(200);
   if ((me == NULL) || (me->i2c_read == NULL) || (me->i2c_write == NULL) || (me->delay_ms == NULL))
     return BS_ERROR;
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_EE_CTRL, 0x40)); // Enable the writing to configuration register
+  me->delay_ms(10);
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_MOTOR_PARAM1, 0x39)); // Set motor resistance
+  me->delay_ms(10);
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_MOTOR_PARAM2, 0x1E)); // Set BEMF constant
+  me->delay_ms(10);
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_MOTOR_PARAM3, 0x3A)); // Set LRTIME
+  me->delay_ms(10);
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_SYS_OPT1, 0x08)); // ISD enable
+  me->delay_ms(10);
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_SYS_OPT2, 0x50)); // Open loop current setting                               
+  me->delay_ms(10);
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_SYS_OPT3, 0xDA)); // Open loop accelerate setting                              
+  me->delay_ms(10);
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_SYS_OPT4, 0xB8)); // Open to closed loop threshold & Align time                                           
+  me->delay_ms(10);
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_SYS_OPT5, 0x10)); // Lock detection current limit. Enabled when high
+  me->delay_ms(10);
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_SYS_OPT6, 0x27)); // Acceleration current limit threshold
+  me->delay_ms(10);
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_SYS_OPT7, 0x37)); // Closed loop accelerate                                              
+  me->delay_ms(10);
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_SYS_OPT8, 0x04)); // No IPD function, Buck regulator voltage select = 3.3V
+  me->delay_ms(10);
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_SYS_OPT9, 0x0C)); // Kt_high = 2Kt. Kt_low = 1/2Kt, Analog input expected at SPEED pin
+  me->delay_ms(10);
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_DEV_CTRL, 0xB6)); //                                    
+  me->delay_ms(10);
 
   CHECK_STATUS(m_drv10975_write_reg(me, DRV10975_REG_EE_CTRL, 0x50)); //  Enable program the EEPROM                     
-
+  me->delay_ms(10);
+  
   CHECK_STATUS(drv10975_set_motor_speed(me, 0)); // Set motor speed = 0 
 
   return BS_OK;
@@ -229,7 +247,7 @@ base_status_t drv10975_check_motor_lock(drv10975_t *me)
   CHECK_STATUS(m_drv10975_read_reg(me, DRV10975_REG_STATUS, &tmp, 1));
 
   me->status = tmp & 0x10;
-
+  
   return BS_OK;
 }
 
