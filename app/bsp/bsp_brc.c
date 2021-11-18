@@ -36,6 +36,11 @@ base_status_t bsp_brc_init(void)
   return BS_OK;
 }
 
+void bsp_brc_power_on(void)
+{
+  bsp_io_write(IO_BRC_POWER, 1);
+}
+
 base_status_t bsp_brc_set_motor_direction(uint8_t dir)
 {
   CHECK_STATUS(drv10975_set_motor_direction(&m_drv10975, dir));

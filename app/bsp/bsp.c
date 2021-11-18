@@ -26,7 +26,7 @@ static inline void m_bsp_spiffs_init(void);
 void bsp_init(void)
 {
   bsp_io_init();
-  // bsp_power_init();
+  bsp_power_init();
 
   bsp_i2c_init();
   bsp_adc_init();

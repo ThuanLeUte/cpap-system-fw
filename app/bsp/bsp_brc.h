@@ -40,6 +40,19 @@ extern "C" {
 base_status_t bsp_brc_init(void);
 
 /**
+ * @brief         BSP brushless motor driver power on
+ *
+ * @param[in]     None
+ *
+ * @attention     None
+ *
+ * @return
+ * - BS_OK
+ * - BS_ERROR
+ */
+void bsp_brc_power_on(void);
+
+/**
  * @brief         BSP brushless motor driver set reverse direction for motor
  *
  * @param[in]     dir       Motor direction

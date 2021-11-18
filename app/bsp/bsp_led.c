@@ -12,6 +12,7 @@
 
 /* Includes ----------------------------------------------------------------- */
 #include "bsp_led.h"
+#include "bsp.h"
 #include "sys_damos_ram.h"
 #include "math.h"
 
@@ -132,7 +133,8 @@ void bsp_led_set_duty(uint32_t led, uint8_t duty)
 
 void LED_ON(uint32_t led)                
 {
-  bsp_led_set_duty(led, 80); 
+  bsp_led_set_duty(led, 80);
+  bsp_delay_ms(10); 
   if(led == IO_LED_GREEN)    bsp_led_set_duty(IO_LED_RED, 0);
   else if(led == IO_LED_RED) bsp_led_set_duty(IO_LED_GREEN, 0); 
 }

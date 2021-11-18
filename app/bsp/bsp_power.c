@@ -86,6 +86,7 @@ void bsp_power_init(void)
 void bsp_power_shutdown_indicate(void)
 {
   LED_OFF();
+  bsp_delay_ms(50);
   BUZZ_ON();
   LED_ON(IO_LED_RED);
   bsp_delay_ms(2000);
@@ -96,6 +97,7 @@ void bsp_power_shutdown_indicate(void)
 void bsp_power_startup_indicate(void)
 {
   LED_OFF();
+  bsp_delay_ms(50);
   BUZZ_ON();
   LED_ON(IO_LED_GREEN);
   bsp_delay_ms(2000);
