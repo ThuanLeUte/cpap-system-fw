@@ -28,11 +28,13 @@ void bsp_io_init(void)
 {
   gpio_pad_select_gpio(IO_BRC_DIR);
   gpio_pad_select_gpio(IO_BRC_POWER);
-  gpio_pad_select_gpio(IO_POWER_LATCH);
+  gpio_pad_select_gpio(IO_BRC_SPEED);
+  gpio_pad_select_gpio(IO_POWER_LATCH);                    
   gpio_pad_select_gpio(IO_POWER_KEY);
 
   gpio_set_direction(IO_BRC_DIR,     GPIO_MODE_OUTPUT);
   gpio_set_direction(IO_BRC_POWER,   GPIO_MODE_OUTPUT);
+  gpio_set_direction(IO_BRC_SPEED,   GPIO_MODE_OUTPUT);
   gpio_set_direction(IO_POWER_LATCH, GPIO_MODE_OUTPUT);
   gpio_set_direction(IO_POWER_KEY,   GPIO_MODE_INPUT);
 
